@@ -5,6 +5,9 @@ version = "1.0.0"
 [[bin]]
 bin_name = "default"
 
+[bin.meta]
+header_dirs = "find ./src -type d | grep *.h"
+
 [bin.tools]
 compiler = "gcc"
 linker = "gcc"

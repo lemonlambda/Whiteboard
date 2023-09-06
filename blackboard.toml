@@ -1,0 +1,10 @@
+[package]
+name = "Whiteboard"
+version = "1.0.0"
+
+[[bin]]
+bin_name = "default"
+
+[bin.tools]
+compiler = "gcc"
+linker = "gcc"

@@ -25,8 +25,8 @@ int main() {
         err(1, "Can't parse", errorBuffer);
     }
 
-    package_t package = init_package();
-    package.callbacks.make_package(&package, conf);
+    config_t config = init_config();
+    config.callbacks.make_bin(&config, conf);
 
     toml_free(conf);
     return 0;

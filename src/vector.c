@@ -7,6 +7,7 @@ vector_t init_vector() {
     vector.contents = malloc(sizeof(void *) * vector.cap);
     vector.callbacks.push = &push;
     vector.callbacks.pop = &pop;
+    vector.callbacks.get = &get;
     vector.callbacks.increase_size = &increase_size;
     return vector;
 }
@@ -21,6 +22,10 @@ void push(vector_t *self, void *value) {
 
 void *pop(vector_t *self) {
     return self->contents[self->len--];
+}
+
+void *get(vector_t *self, usize index) {
+    return self->contents[index];
 }
 
 void increase_size(vector_t *self) {

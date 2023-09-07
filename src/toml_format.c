@@ -17,7 +17,7 @@ package_t init_package() {
 void make_package(package_t *self, toml_table_t *toml) {
     toml_table_t *package = toml_table_in(toml, "package");
     if (!package) {
-        err(1, "Package doesn't exist in whiteboard.toml");
+        errx(1, "Package doesn't exist in whiteboard.toml");
     }
   
     toml_datum_t name = toml_string_in(package, "name");
@@ -40,7 +40,7 @@ bin_t init_bin() {
 void make_bin(config_t *self, toml_table_t *toml) {
     toml_array_t *array = toml_array_in(toml, "bin");
     if (!array) {
-        err(1, "Bins doesn't exist in whiteboard.toml");
+        errx(1, "Bins doesn't exist in whiteboard.toml");
     }
     bool default_defined_already = false;
     

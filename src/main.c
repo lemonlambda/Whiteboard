@@ -23,7 +23,7 @@ i32 main() {
     fclose(fp);
 
     if (!conf) {
-        err(1, "Can't parse", errorBuffer);
+        errx(1, "Can't parse: %s", errorBuffer);
     }
 
     config_t config = init_config();

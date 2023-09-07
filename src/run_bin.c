@@ -35,7 +35,7 @@ void run_bin(package_t *package, bin_t *bin) {
     // Link the objs
     char *link_f = "gcc -B gcc $(find %s/obj -name \"*.o\") -o %s/bin/%s-%s";
     char *link_objs_command = malloc(sizeof(char) * (strlen(link_f) + strlen(target_dir_path) * 2 + strlen(package->name) + strlen(package->version) + 1));
-    sprintf(link_objs_command, link_f, target_dir_path, target_dir_path, package->name, package->version);
+    sprintf(link_objs_command, link_f, target_dir_path, target_dir_path, bin->name, package->version);
     system(link_objs_command);
     free(link_objs_command);
 

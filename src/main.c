@@ -3,13 +3,31 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <err.h>
+#include <assert.h>
 
 #include "run_bin.h"
 #include "rust_types.h"
 #include "toml.h"
 #include "toml_format.h"
 
-i32 main() {
+i32 main(int argc, const char **argv) {
+    assert(argv != NULL);
+
+    bool runMode = false;
+    bool defaultBuild = true;
+    const char *buildName;
+    
+    if (argc < 2)
+        errx(1, "Whiteboard requires a sub-command of: `build`, or `run`");
+    if (argc > 2)
+        defaultBuild = false;
+
+    if (strcmp(argv[1], "run"))
+        runMode = true;
+
+    if (!defaultBuild)
+        buildName = argv[2];
+
     FILE *fp;
     char errorBuffer[200];
 
@@ -28,14 +46,23 @@ i32 main() {
 
     config_t config = init_config();
     config.callbacks.make_config(&config, conf);
-    bin_t *value = (bin_t *)config.bin.callbacks.get(&config.bin, 0);
-    printf("Name: %s\n", value->name);
-    printf("Src Dir: %s\n", value->srcdir);
-    printf("Include Dir: %s\n", value->includedir);
-    printf("Target Dir: %s\n", value->targetdir);
-    printf("Default: %d\n", value->default_bin);
+    for (int i = 0; ; i++) {
+        bin_t *value = (bin_t *)config.bin.callbacks.get(&config.bin, i);
+        if (value == NULL) {
+            printf("Can't find a build by that name\n");
+            break;
+        }
 
-    run_bin(&config.package, value);
+        if (strcmp(value->name, buildName) == false) {
+            run_bin(&config.package, value);
+            break;
+        }
+
+        if (defaultBuild) {
+            run_bin(&config.package, value);
+            break;
+        }
+    }
 
     toml_free(conf);
     free_config(config);

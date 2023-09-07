@@ -65,7 +65,7 @@ void make_bin(config_t *self, toml_table_t *toml) {
         toml_datum_t includedir = toml_string_in(table, "includedir");
         if (includedir.ok)
             bin.includedir = includedir.u.s;
-        toml_datum_t targetdir = toml_string_in(table, "target");
+        toml_datum_t targetdir = toml_string_in(table, "targetdir");
         if (targetdir.ok)
             bin.targetdir = targetdir.u.s;
 
@@ -81,6 +81,7 @@ void make_bin(config_t *self, toml_table_t *toml) {
 }
 
 void make_config(config_t *self, toml_table_t *toml) {
+    self->package.callbacks.make_package(&self->package, toml);
     self->callbacks.make_bin(self, toml);
 }
 // Inits a blank config

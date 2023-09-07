@@ -49,33 +49,34 @@ void make_bin(config_t *self, toml_table_t *toml) {
         if (!table)
             break;
         
-        bin_t bin = init_bin();
+        bin_t *bin = malloc(sizeof(bin_t));
+        *bin = init_bin();
         
         toml_datum_t name = toml_string_in(table, "name");
         if (!name.ok)
             err(1, "There is no name for the bin");
         toml_datum_t default_bin = toml_bool_in(table, "default");
         if (!default_bin.ok)
-            bin.default_bin = (bool)default_bin.u.b;
+            bin->default_bin = (bool)default_bin.u.b;
         
         // Dirs
         toml_datum_t srcdir = toml_string_in(table, "srcdir");
         if (srcdir.ok)
-            bin.srcdir = srcdir.u.s;
+            bin->srcdir = srcdir.u.s;
         toml_datum_t includedir = toml_string_in(table, "includedir");
         if (includedir.ok)
-            bin.includedir = includedir.u.s;
+            bin->includedir = includedir.u.s;
         toml_datum_t targetdir = toml_string_in(table, "targetdir");
         if (targetdir.ok)
-            bin.targetdir = targetdir.u.s;
+            bin->targetdir = targetdir.u.s;
 
-        if (bin.default_bin && !default_defined_already)
+        if (bin->default_bin && !default_defined_already)
             default_defined_already = true;
-        else if (bin.default_bin && default_defined_already)
-            err(1, "Default bin already defined in bin: `%s`", name.u.s);
+        else if (bin->default_bin && default_defined_already)
+            errx(1, "Default bin already defined in bin: `%s`", name.u.s);
 
-        bin.name = name.u.s;
-        self->bin.callbacks.push(&self->bin, (void *)&bin);
+        bin->name = name.u.s;
+        self->bin.callbacks.push(&self->bin, (void *)bin);
 
     }
 }

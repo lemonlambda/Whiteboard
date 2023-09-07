@@ -54,12 +54,12 @@ i32 main(int argc, const char **argv) {
         }
 
         if (strcmp(value->name, buildName) == false) {
-            run_bin(&config.package, value);
+            build_bin(&config.package, value);
             break;
         }
 
         if (defaultBuild) {
-            run_bin(&config.package, value);
+            build_bin(&config.package, value);
             break;
         }
     }

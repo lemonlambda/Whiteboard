@@ -8,7 +8,7 @@
 #include "run_bin.h"
 #include "color_codes.h"
 
-void run_bin(package_t *package, bin_t *bin) {
+void build_bin(package_t *package, bin_t *bin) {
     // Make the required target dirs
     char *target_dir_path = malloc(sizeof(char) * (strlen(bin->targetdir) + strlen(package->name) + 2));
     assert (target_dir_path != NULL);

@@ -35,7 +35,7 @@ i32 main() {
     printf("Target Dir: %s\n", value->targetdir);
     printf("Default: %d\n", value->default_bin);
 
-    run_bin(config.package.name, value);
+    run_bin(&config.package, value);
 
     toml_free(conf);
     return 0;

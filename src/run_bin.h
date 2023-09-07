@@ -2,4 +2,4 @@
 
 #include "toml_format.h"
 
-void run_bin(char *package_name, bin_t *bin);
+void run_bin(package_t *package, bin_t *bin);

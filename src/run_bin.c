@@ -8,7 +8,7 @@
 
 void run_bin(char *package_name, bin_t *bin) {
     // Make the required target dirs
-    char *target_dir_path = malloc(sizeof(bin->targetdir) + sizeof(package_name));
+    char *target_dir_path = malloc(sizeof(char) * (strlen(bin->targetdir) + strlen(package_name) + 2));
     sprintf(target_dir_path, "%s/%s", bin->targetdir, package_name);
     char *mkdir_f = "mkdir -p %s/obj %s/bin";
     char *make_dirs_command = malloc(sizeof(char) * (strlen(mkdir_f) + strlen(target_dir_path) * 2 + 2));

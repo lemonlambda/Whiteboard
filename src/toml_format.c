@@ -3,6 +3,7 @@
 
 #include <err.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 // Inits a blank package
 package_t init_package() {
@@ -22,6 +23,7 @@ void make_package(package_t *self, toml_table_t *toml) {
   
     toml_datum_t name = toml_string_in(package, "name");
     toml_datum_t version = toml_string_in(package, "version");
+
 
     self->name = name.u.s;
     self->version = version.u.s;
@@ -43,22 +45,22 @@ void make_bin(config_t *self, toml_table_t *toml) {
         errx(1, "Bins doesn't exist in whiteboard.toml");
     }
     bool default_defined_already = false;
-    
+
     for (int i = 0; ; i++) {
         toml_table_t *table = toml_table_at(array, i);
         if (!table)
             break;
-        
+
         bin_t *bin = malloc(sizeof(bin_t));
-        *bin = init_bin();
-        
+	*bin = init_bin();
+
         toml_datum_t name = toml_string_in(table, "name");
         if (!name.ok)
-            err(1, "There is no name for the bin");
+            errx(1, "There is no name for the bin");
         toml_datum_t default_bin = toml_bool_in(table, "default");
         if (!default_bin.ok)
             bin->default_bin = (bool)default_bin.u.b;
-        
+
         // Dirs
         toml_datum_t srcdir = toml_string_in(table, "srcdir");
         if (srcdir.ok)
@@ -76,7 +78,7 @@ void make_bin(config_t *self, toml_table_t *toml) {
             errx(1, "Default bin already defined in bin: `%s`", name.u.s);
 
         bin->name = name.u.s;
-        self->bin.callbacks.push(&self->bin, (void *)bin);
+        self->bin.callbacks.push(&self->bin, bin);
 
     }
 }
@@ -95,3 +97,16 @@ config_t init_config() {
     return config;
 }
 
+void free_config(config_t const self)
+{
+	free(self.package.name);
+	free(self.package.version);
+	for (size_t i = 0; i < self.bin.len; ++i) {
+		bin_t *bin = self.bin.contents[i];
+		free(bin->name);
+		free(bin->includedir);
+		free(bin);
+	}
+	free_vector(self.bin);
+	//toml_free(self.package.version)
+}

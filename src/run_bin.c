@@ -8,13 +8,15 @@
 
 void run_bin(char *package_name, bin_t *bin) {
     // Make the required target dirs
-    char *target_dir_path = malloc(sizeof(char) * (strlen(bin->targetdir) + strlen(package_name) + 2));
+    char *target_dir_path = malloc(strlen(bin->targetdir) + strlen(package_name) + 2);
+    assert (target_dir_path != NULL);
     sprintf(target_dir_path, "%s/%s", bin->targetdir, package_name);
     char *mkdir_f = "mkdir -p %s/obj %s/bin";
     char *make_dirs_command = malloc(sizeof(char) * (strlen(mkdir_f) + strlen(target_dir_path) * 2 + 2));
     sprintf(make_dirs_command, mkdir_f, target_dir_path, target_dir_path);
     system(make_dirs_command);
     free(make_dirs_command);
+    free(target_dir_path);
 
     // Make the objs
     char *obj_f = "gcc -O2 -c $(find %s -name \"*.c\") -I $(find %s -type d | grep \"*.h\")";

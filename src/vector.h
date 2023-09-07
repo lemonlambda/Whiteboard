@@ -20,3 +20,4 @@ void push(vector_t *self, void *value);
 void *pop(vector_t *self);
 void *get(vector_t *self, usize index);
 void increase_size(vector_t* self);
+void free_vector(vector_t const self);

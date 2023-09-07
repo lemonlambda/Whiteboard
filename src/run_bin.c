@@ -9,6 +9,7 @@
 void run_bin(package_t *package, bin_t *bin) {
     // Make the required target dirs
     char *target_dir_path = malloc(sizeof(char) * (strlen(bin->targetdir) + strlen(package->name) + 2));
+    assert (target_dir_path != NULL);
     sprintf(target_dir_path, "%s/%s", bin->targetdir, package->name);
     char *mkdir_f = "mkdir -p %s/obj %s/bin";
     char *make_dirs_command = malloc(sizeof(char) * (strlen(mkdir_f) + strlen(target_dir_path) * 2 + 2));
@@ -37,4 +38,6 @@ void run_bin(package_t *package, bin_t *bin) {
     sprintf(link_objs_command, link_f, target_dir_path, target_dir_path, package->name, package->version);
     system(link_objs_command);
     free(link_objs_command);
+
+    free(target_dir_path);
 }

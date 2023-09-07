@@ -38,5 +38,6 @@ i32 main() {
     run_bin(&config.package, value);
 
     toml_free(conf);
+    free_config(config);
     return 0;
 }

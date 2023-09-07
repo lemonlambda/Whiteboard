@@ -45,3 +45,4 @@ typedef struct config {
 void make_bin(config_t *self, toml_table_t *toml);
 void make_config(config_t *self, toml_table_t *toml);
 config_t init_config();
+void free_config(config_t const self);

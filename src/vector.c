@@ -27,7 +27,8 @@ void *pop(vector_t *self) {
 }
 
 void *get(vector_t *self, usize index) {
-    assert (index < self->len);
+    if (index >= self->len)
+        return NULL;
     return self->contents[index];
 }
 

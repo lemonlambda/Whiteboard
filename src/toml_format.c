@@ -40,19 +40,34 @@ void make_bin(config_t *self, toml_table_t *toml) {
         err(1, "Bins doesn't exist in whiteboard.toml");
     }
     for (int i = 0; ; i++) {
-        toml_table_t *key = toml_table_at(array, i);
-        self->bin.callbacks.push(&self->bin, (void *)key);
-
-        if (!key)
+        toml_table_t *table = toml_table_at(array, i);
+        if (!table)
             break;
+        toml_datum_t name = toml_string_in(table, "name");
+        if (!name.ok)
+            err(1, "There is no name for the bin");
+        toml_datum_t default_bin = toml_bool_in(table, "default");
+        if (!default_bin.ok)
+            err(1, "There is no default value for the bin");
+
+        bin_t bin = init_bin();
+        bin.default_bin = (bool)default_bin.u.b;
+        bin.name = name.u.s;
+        self->bin.callbacks.push(&self->bin, (void *)&bin);
+
     }
 }
 
+void make_config(config_t *self, toml_table_t *toml) {
+    self->callbacks.make_bin(self, toml);
+}
 // Inits a blank config
 config_t init_config() {
     config_t config;
     config.package = init_package();
     config.bin = init_vector();
     config.callbacks.make_bin = &make_bin;
+    config.callbacks.make_config = &make_config;
     return config;
 }
+

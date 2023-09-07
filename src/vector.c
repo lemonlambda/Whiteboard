@@ -13,11 +13,11 @@ vector_t init_vector() {
 }
 
 void push(vector_t *self, void *value) {
-    if (self->len + 1 > self->cap) {
+    if (self->len >= self->cap) {
         self->callbacks.increase_size(self);
     }
 
-    self->contents[++self->len] = value;
+    self->contents[self->len++] = value;
 }
 
 void *pop(vector_t *self) {

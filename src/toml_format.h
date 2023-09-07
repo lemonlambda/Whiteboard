@@ -11,7 +11,7 @@ typedef struct package {
     char *version;
 
     struct {
-        void (*make_package)(struct package *self, toml_table_t *toml);
+        void (*make_package)(struct package*, toml_table_t*);
     } callbacks;
 } package_t;
 
@@ -21,6 +21,9 @@ package_t init_package();
 typedef struct bin {
     bool default_bin;
     char *name;
+    char *srcdir;
+    char *includedir;
+    char *targetdir;
 
     struct {
     } callbacks;
@@ -34,9 +37,11 @@ typedef struct config {
     vector_t bin;
 
     struct {
-        void (*make_bin)(struct config *self, toml_table_t *toml);
+        void (*make_bin)(struct config*, toml_table_t*);
+        void (*make_config)(struct config*, toml_table_t*);
     } callbacks;
 } config_t;
 
 void make_bin(config_t *self, toml_table_t *toml);
+void make_config(config_t *self, toml_table_t *toml);
 config_t init_config();

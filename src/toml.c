@@ -1580,7 +1580,7 @@ static void xfree_tab(toml_table_t *p) {
   xfree(p);
 }
 
-void toml_free(toml_table_t *tab) { xfree_tab(tab); }
+inline void toml_free(toml_table_t *tab) { xfree_tab(tab); }
 
 static void set_token(context_t *ctx, tokentype_t tok, int lineno, char *ptr,
                       int len) {

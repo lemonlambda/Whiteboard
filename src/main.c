@@ -8,7 +8,7 @@
 #include "toml.h"
 #include "toml_format.h"
 
-int main() {
+i32 main() {
     FILE *fp;
     char errorBuffer[200];
 
@@ -18,7 +18,7 @@ int main() {
     }
 
     // Actually parse the toml now
-    toml_table_t* conf = toml_parse_file(fp, errorBuffer, sizeof(errorBuffer));
+    toml_table_t *conf = toml_parse_file(fp, errorBuffer, sizeof(errorBuffer));
     fclose(fp);
 
     if (!conf) {
@@ -26,7 +26,10 @@ int main() {
     }
 
     config_t config = init_config();
-    config.callbacks.make_bin(&config, conf);
+    config.callbacks.make_config(&config, conf);
+    bin_t *value = (bin_t *)config.bin.callbacks.get(&config.bin, 0);
+    printf("Name: %s\n", value->name);
+    printf("Default: %d\n", value->default_bin);
 
     toml_free(conf);
     return 0;

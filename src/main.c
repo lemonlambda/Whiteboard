@@ -13,20 +13,43 @@
 i32 main(int argc, const char **argv) {
     assert(argv != NULL);
 
-    bool runMode = false;
-    bool defaultBuild = true;
-    const char *buildName;
+    bool run_mode = false;
+    bool default_build = true;
+    const char *build_name;
+    char *run_args = malloc(sizeof(char));
+    assert(run_args != NULL);
     
     if (argc < 2)
         errx(1, "Whiteboard requires a sub-command of: `build`, or `run`");
-    if (argc > 2)
-        defaultBuild = false;
+    if (argc >= 3)
+        if (strcmp(argv[2], "--") != 0)
+            default_build = false;
 
-    if (strcmp(argv[1], "run"))
-        runMode = true;
+    if (strcmp(argv[1], "run") == 0)
+        run_mode = true;
+    if (argc >= 4 && run_mode) {
+        bool got_two_dashes = false;
+        for (int i = 3; i <= argc; i++) {
+            const char *arg = argv[i - 1];
 
-    if (!defaultBuild)
-        buildName = argv[2];
+            if (got_two_dashes) {
+                char *formatted = malloc(sizeof(char) * (strlen(arg) + 5));
+                sprintf(formatted, "%s ", arg);
+                run_args = (char *)realloc(run_args, sizeof(char) * (strlen(run_args) + strlen(formatted) + 1));
+                strcat(run_args, formatted);
+                free(formatted);
+            }
+
+            if (strcmp(arg, "--") == 0) {
+                got_two_dashes = true;
+            }
+        }
+    }
+    if (!run_args)
+        printf("%s\n", run_args);
+
+    if (!default_build)
+        build_name = argv[2];
 
     FILE *fp;
     char errorBuffer[200];
@@ -53,17 +76,18 @@ i32 main(int argc, const char **argv) {
             break;
         }
 
-        if (strcmp(value->name, buildName) == false) {
-            build_bin(&config.package, value, runMode);
+        if (strcmp(value->name, build_name) == false) {
+            build_bin(&config.package, value, run_mode, run_args);
             break;
         }
 
-        if (defaultBuild) {
-            build_bin(&config.package, value, runMode);
+        if (default_build) {
+            build_bin(&config.package, value, run_mode, run_args);
             break;
         }
     }
 
+    free(run_args);
     toml_free(conf);
     free_config(config);
     return 0;

@@ -8,7 +8,7 @@
 #include "run_bin.h"
 #include "color_codes.h"
 
-void build_bin(package_t *package, bin_t *bin) {
+void build_bin(package_t *package, bin_t *bin, bool run) {
     // Make the required target dirs
     char *target_dir_path = malloc(sizeof(char) * (strlen(bin->targetdir) + strlen(package->name) + 2));
     assert (target_dir_path != NULL);
@@ -48,6 +48,16 @@ void build_bin(package_t *package, bin_t *bin) {
     if (system(link_objs_command) == -1)
         errx(1, "Recieved Error in `Linking` stage");
     free(link_objs_command);
+
+    if (run) {
+        char *run_f = "./%s/bin/%s-%s";
+        char *run_bin_command = malloc(sizeof(char) * (strlen(run_f) + strlen(target_dir_path) + strlen(package->name) + strlen(package->version) + 1));
+        sprintf(run_bin_command, run_f, target_dir_path, bin->name, package->version);
+        printf("%sRunning:%s %s\n", BHMAG, CRESET, run_bin_command);
+        if (system(run_bin_command) == -1)
+            errx(1, "Recieved Error in `Linking` stage");
+        free(run_bin_command);
+    }
 
     free(target_dir_path);
 }

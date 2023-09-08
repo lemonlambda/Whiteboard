@@ -76,7 +76,7 @@ i32 main(int argc, const char **argv) {
             break;
         }
 
-        if (strcmp(value->name, build_name) == false) {
+        if (strcmp(value->name, build_name) == 0) {
             build_bin(&config.package, value, run_mode, run_args);
             break;
         }

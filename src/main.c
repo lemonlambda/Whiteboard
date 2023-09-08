@@ -3,13 +3,30 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <err.h>
+#include <assert.h>
 
 #include "run_bin.h"
 #include "rust_types.h"
 #include "toml.h"
 #include "toml_format.h"
+#include "args_parser.h"
 
-i32 main() {
+int main(int argc, const char **argv) {
+    assert(argv != NULL);
+
+    bool run_mode = false;
+    bool default_build = true;
+    bool quiet_mode = false;
+    const char *build_name = "";
+    char *run_args = "";
+
+    bool ran = parse_args(argc, argv, &run_mode, &default_build, &quiet_mode, build_name, run_args);
+    if (!ran)
+        errx(1, "You need to provide a sub-command of: `run` or `build`");
+
+    assert(run_args != NULL);
+    assert(build_name != NULL);
+
     FILE *fp;
     char errorBuffer[200];
 
@@ -23,20 +40,30 @@ i32 main() {
     fclose(fp);
 
     if (!conf) {
-        err(1, "Can't parse", errorBuffer);
+        errx(1, "Can't parse: %s", errorBuffer);
     }
 
     config_t config = init_config();
     config.callbacks.make_config(&config, conf);
-    bin_t *value = (bin_t *)config.bin.callbacks.get(&config.bin, 0);
-    printf("Name: %s\n", value->name);
-    printf("Src Dir: %s\n", value->srcdir);
-    printf("Include Dir: %s\n", value->includedir);
-    printf("Target Dir: %s\n", value->targetdir);
-    printf("Default: %d\n", value->default_bin);
+    for (int i = 0; ; i++) {
+        bin_t *value = (bin_t *)config.bin.callbacks.get(&config.bin, i);
+        if (value == NULL) {
+            printf("Can't find a build by that name\n");
+            break;
+        }
 
-    run_bin(config.package.name, value);
+        if (strcmp(value->name, build_name) == 0) {
+            build_bin(&config.package, value, run_mode, run_args, quiet_mode);
+            break;
+        }
+
+        if (default_build) {
+            build_bin(&config.package, value, run_mode, run_args, quiet_mode);
+            break;
+        }
+    }
 
     toml_free(conf);
+    free_config(config);
     return 0;
 }

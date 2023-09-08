@@ -2,4 +2,4 @@
 
 #include "toml_format.h"
 
-void run_bin(char *package_name, bin_t *bin);
+void build_bin(package_t *package, bin_t *bin, bool run, char *run_args, bool quiet_mode);

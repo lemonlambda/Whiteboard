@@ -11,7 +11,7 @@
 #include "toml_format.h"
 #include "args_parser.h"
 
-i32 main(int argc, const char **argv) {
+int main(int argc, const char **argv) {
     assert(argv != NULL);
 
     bool run_mode = false;
@@ -20,7 +20,9 @@ i32 main(int argc, const char **argv) {
     const char *build_name = "";
     char *run_args = "";
 
-    parse_args(argc, argv, &run_mode, &default_build, &quiet_mode, build_name, run_args);
+    bool ran = parse_args(argc, argv, &run_mode, &default_build, &quiet_mode, build_name, run_args);
+    if (!ran)
+        errx(1, "You need to provide a sub-command of: `run` or `build`");
 
     assert(run_args != NULL);
     assert(build_name != NULL);
@@ -51,12 +53,12 @@ i32 main(int argc, const char **argv) {
         }
 
         if (strcmp(value->name, build_name) == 0) {
-            build_bin(&config.package, value, run_mode, run_args);
+            build_bin(&config.package, value, run_mode, run_args, quiet_mode);
             break;
         }
 
         if (default_build) {
-            build_bin(&config.package, value, run_mode, run_args);
+            build_bin(&config.package, value, run_mode, run_args, quiet_mode);
             break;
         }
     }

@@ -15,7 +15,7 @@ bool run(const char *arg, const char *build_name, bool build_mode) {
     return true;
 }
 
-void parse_args(int argc, const char **argv, bool *run_mode, bool *default_build, bool *quiet_mode, const char *build_name, char *run_args) {
+bool parse_args(int argc, const char **argv, bool *run_mode, bool *default_build, bool *quiet_mode, const char *build_name, char *run_args) {
     bool got_two_dashes = false;
     bool run_func = false;
     bool build_mode = false;
@@ -24,6 +24,7 @@ void parse_args(int argc, const char **argv, bool *run_mode, bool *default_build
 
         if (strcmp(arg, "--quiet") == 0) {
             *quiet_mode = true;
+            continue;
         }
         
         if ((run_func || build_mode) && !got_two_dashes) {
@@ -46,5 +47,7 @@ void parse_args(int argc, const char **argv, bool *run_mode, bool *default_build
             }
         }
     }
+
+    return run_func;
 }
 

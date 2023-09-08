@@ -63,8 +63,8 @@ int main(int argc, const char **argv) {
         }
     }
 
-    if (run_args != NULL)
-        free(run_args);
+    free((void*)build_name);
+    free(run_args);
     toml_free(conf);
     free_config(config);
     return 0;

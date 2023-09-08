@@ -1,2 +1,4 @@
 /target
 vgcore.*
+make.sh
+*.o

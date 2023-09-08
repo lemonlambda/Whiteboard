@@ -29,15 +29,13 @@ bool parse_args(int argc, const char **argv, bool *run_mode, bool *default_build
         }
         
         if ((run_func || build_mode) && !got_two_dashes) {
-            got_two_dashes = run(arg, build_name, build_mode);
+            got_two_dashes = run(arg, pbuild_name, build_mode);
         } else if (got_two_dashes) {
-            char *formatted = malloc(sizeof(char) * (strlen(arg) + 3));
-            assert(formatted != NULL);
+            char formatted[strlen(arg) + 5];
             sprintf(formatted, "%s ", arg);
-            *run_args = (char *)realloc(*run_args, sizeof(char) * (strlen(*run_args) + strlen(formatted) + 1));
-            assert(formatted != NULL);
-            strcat(*run_args, formatted);
-            free(formatted);
+            *run_args = realloc(*run_args, sizeof(char) * (strlen(*run_args) + strlen(formatted) + 1));
+	          assert (*run_args != NULL);
+            strcat(*prun_args, formatted);
         } else {
 
             if (strcmp(arg, "run") == 0) {

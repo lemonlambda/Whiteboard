@@ -20,7 +20,7 @@ int main(int argc, const char **argv) {
     const char *build_name = calloc(1, sizeof(char));
     char *run_args = calloc(1, sizeof(char));
 
-    bool ran = parse_args(argc, argv, &run_mode, &default_build, &quiet_mode, build_name, run_args);
+    bool ran = parse_args(argc, argv, &run_mode, &default_build, &quiet_mode, &build_name, &run_args);
     if (!ran)
         errx(1, "You need to provide a sub-command of: `run` or `build`");
 
@@ -63,6 +63,7 @@ int main(int argc, const char **argv) {
         }
     }
 
+    free((void*)build_name);
     free(run_args);
     toml_free(conf);
     free_config(config);

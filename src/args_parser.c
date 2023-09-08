@@ -21,6 +21,7 @@ bool parse_args(int argc, const char **argv, bool *run_mode, bool *default_build
     bool build_mode = false;
     for (int i = 0; i < argc; i++) {
         const char *arg = argv[i];
+        printf("iter: %d\n", i);
 
         if (strcmp(arg, "--quiet") == 0) {
             *quiet_mode = true;
@@ -31,9 +32,15 @@ bool parse_args(int argc, const char **argv, bool *run_mode, bool *default_build
             got_two_dashes = run(arg, build_name, build_mode);
         } else if (got_two_dashes) {
             char *formatted = malloc(sizeof(char) * (strlen(arg) + 5));
+            assert(formatted != NULL);
+            printf("I hate debugging\n");
             sprintf(formatted, "%s ", arg);
+            printf("I hate debugging\n");
             run_args = (char *)realloc(run_args, sizeof(char) * (strlen(run_args) + strlen(formatted) + 1));
+            assert(formatted != NULL);
+            printf("I hate debugging\n");
             strcat(run_args, formatted);
+            printf("I hate debugging\n");
             free(formatted);
         } else {
 

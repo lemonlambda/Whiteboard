@@ -17,8 +17,8 @@ int main(int argc, const char **argv) {
     bool run_mode = false;
     bool default_build = true;
     bool quiet_mode = false;
-    const char *build_name = "";
-    char *run_args = "";
+    const char *build_name = calloc(1, sizeof(char));
+    char *run_args = calloc(1, sizeof(char));
 
     bool ran = parse_args(argc, argv, &run_mode, &default_build, &quiet_mode, build_name, run_args);
     if (!ran)
@@ -63,6 +63,7 @@ int main(int argc, const char **argv) {
         }
     }
 
+    free(run_args);
     toml_free(conf);
     free_config(config);
     return 0;

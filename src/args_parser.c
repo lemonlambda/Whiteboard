@@ -15,13 +15,13 @@ bool run(const char *arg, const char *build_name, bool build_mode) {
     return true;
 }
 
+// run_args must be on the heap (we use realloc)
 bool parse_args(int argc, const char **argv, bool *run_mode, bool *default_build, bool *quiet_mode, const char *build_name, char *run_args) {
     bool got_two_dashes = false;
     bool run_func = false;
     bool build_mode = false;
     for (int i = 0; i < argc; i++) {
         const char *arg = argv[i];
-        printf("iter: %d\n", i);
 
         if (strcmp(arg, "--quiet") == 0) {
             *quiet_mode = true;
@@ -33,14 +33,10 @@ bool parse_args(int argc, const char **argv, bool *run_mode, bool *default_build
         } else if (got_two_dashes) {
             char *formatted = malloc(sizeof(char) * (strlen(arg) + 5));
             assert(formatted != NULL);
-            printf("I hate debugging\n");
             sprintf(formatted, "%s ", arg);
-            printf("I hate debugging\n");
             run_args = (char *)realloc(run_args, sizeof(char) * (strlen(run_args) + strlen(formatted) + 1));
             assert(formatted != NULL);
-            printf("I hate debugging\n");
             strcat(run_args, formatted);
-            printf("I hate debugging\n");
             free(formatted);
         } else {
 

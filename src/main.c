@@ -15,7 +15,7 @@ i32 main(int argc, const char **argv) {
 
     bool run_mode = false;
     bool default_build = true;
-    const char *build_name;
+    char *build_name;
     char *run_args = malloc(sizeof(char));
     assert(run_args != NULL);
     
@@ -49,7 +49,7 @@ i32 main(int argc, const char **argv) {
         printf("%s\n", run_args);
 
     if (!default_build)
-        build_name = argv[2];
+        build_name = (char *)argv[2];
 
     FILE *fp;
     char errorBuffer[200];

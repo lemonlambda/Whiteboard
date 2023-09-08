@@ -13,7 +13,7 @@ void build_bin(package_t *package, bin_t *bin, bool run, char *run_args, bool qu
     char *target_dir_path = malloc(sizeof(char) * (strlen(bin->targetdir) + strlen(package->name) + 2));
     assert (target_dir_path != NULL);
     sprintf(target_dir_path, "%s/%s", bin->targetdir, package->name);
-    char *mkdir_f = "mkdir -p %s/obj %s/bin";
+    char *mkdir_f = "mkdir %s && mkdir %s/obj && mkdir %s/bin";
     char *make_dirs_command = malloc(sizeof(char) * (strlen(mkdir_f) + strlen(target_dir_path) * 2 + 2));
     sprintf(make_dirs_command, mkdir_f, target_dir_path, target_dir_path);
     if (!quiet_mode)

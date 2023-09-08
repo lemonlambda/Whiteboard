@@ -7,16 +7,16 @@
 #include "rust_types.h"
 #include "args_parser.h"
 
-bool run(const char *arg, const char *build_name, bool build_mode) {
+bool run(const char *arg, const char **build_name, bool build_mode) {
     if (strcmp(arg, "--") != 0) {
-        build_name = arg;
+        *build_name = arg;
         return false;
     }
     return true;
 }
 
 // run_args must be on the heap (we use realloc)
-bool parse_args(int argc, const char **argv, bool *run_mode, bool *default_build, bool *quiet_mode, const char *build_name, char *run_args) {
+bool parse_args(int argc, const char **argv, bool *run_mode, bool *default_build, bool *quiet_mode, const char **build_name, char **run_args) {
     bool got_two_dashes = false;
     bool run_func = false;
     bool build_mode = false;
@@ -31,12 +31,12 @@ bool parse_args(int argc, const char **argv, bool *run_mode, bool *default_build
         if ((run_func || build_mode) && !got_two_dashes) {
             got_two_dashes = run(arg, build_name, build_mode);
         } else if (got_two_dashes) {
-            char *formatted = malloc(sizeof(char) * (strlen(arg) + 5));
+            char *formatted = malloc(sizeof(char) * (strlen(arg) + 3));
             assert(formatted != NULL);
             sprintf(formatted, "%s ", arg);
-            run_args = (char *)realloc(run_args, sizeof(char) * (strlen(run_args) + strlen(formatted) + 1));
+            *run_args = (char *)realloc(*run_args, sizeof(char) * (strlen(*run_args) + strlen(formatted) + 1));
             assert(formatted != NULL);
-            strcat(run_args, formatted);
+            strcat(*run_args, formatted);
             free(formatted);
         } else {
 

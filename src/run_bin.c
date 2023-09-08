@@ -17,13 +17,13 @@ void build_bin(package_t *package, bin_t *bin, bool run, char *run_args, bool qu
     char *make_dirs_command = malloc(sizeof(char) * (strlen(mkdir_f) + strlen(target_dir_path) * 2 + 2));
     sprintf(make_dirs_command, mkdir_f, target_dir_path, target_dir_path);
     if (!quiet_mode)
-    printf("%sMaking Dirs:%s %s\n", BHMAG, CRESET, make_dirs_command);
+        printf("%sMaking Dirs:%s %s\n", BHMAG, CRESET, make_dirs_command);
     if (system(make_dirs_command) == -1)
         errx(1, "Recieved Error in `Making Dirs` stage");
     free(make_dirs_command);
 
     // Make the objs
-    char *obj_f = "gcc -O2 -c $(find %s -name \"*.c\") -I $(find %s -type d | grep \"*.h\")";
+    char *obj_f = "gcc -O2 -c $(find %s -name \"*.c\") -I %s";
     char *compile_objs_command = malloc(sizeof(char) * (strlen(obj_f) + strlen(bin->includedir) + strlen(bin->srcdir) + 1));
     assert(compile_objs_command != NULL);
     sprintf(compile_objs_command, obj_f, bin->srcdir, bin->includedir);

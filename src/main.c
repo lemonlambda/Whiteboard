@@ -9,47 +9,21 @@
 #include "rust_types.h"
 #include "toml.h"
 #include "toml_format.h"
+#include "args_parser.h"
 
 i32 main(int argc, const char **argv) {
     assert(argv != NULL);
 
     bool run_mode = false;
     bool default_build = true;
-    char *build_name;
-    char *run_args = malloc(sizeof(char));
+    bool quiet_mode = false;
+    const char *build_name;
+    char *run_args = "";
+
+    parse_args(argc, argv, &run_mode, &default_build, &quiet_mode, build_name, run_args);
+
     assert(run_args != NULL);
-    
-    if (argc < 2)
-        errx(1, "Whiteboard requires a sub-command of: `build`, or `run`");
-    if (argc >= 3)
-        if (strcmp(argv[2], "--") != 0)
-            default_build = false;
-
-    if (strcmp(argv[1], "run") == 0)
-        run_mode = true;
-    if (argc >= 4 && run_mode) {
-        bool got_two_dashes = false;
-        for (int i = 3; i <= argc; i++) {
-            const char *arg = argv[i - 1];
-
-            if (got_two_dashes) {
-                char *formatted = malloc(sizeof(char) * (strlen(arg) + 5));
-                sprintf(formatted, "%s ", arg);
-                run_args = (char *)realloc(run_args, sizeof(char) * (strlen(run_args) + strlen(formatted) + 1));
-                strcat(run_args, formatted);
-                free(formatted);
-            }
-
-            if (strcmp(arg, "--") == 0) {
-                got_two_dashes = true;
-            }
-        }
-    }
-    if (!run_args)
-        printf("%s\n", run_args);
-
-    if (!default_build)
-        build_name = (char *)argv[2];
+    assert(build_name != NULL);
 
     FILE *fp;
     char errorBuffer[200];
@@ -87,7 +61,6 @@ i32 main(int argc, const char **argv) {
         }
     }
 
-    free(run_args);
     toml_free(conf);
     free_config(config);
     return 0;

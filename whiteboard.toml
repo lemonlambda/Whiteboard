@@ -10,3 +10,8 @@ includedir = "src"
 [[bin]]
 name = "Stable"
 includedir = "src"
+
+[[bin]]
+name = "NullStrTest"
+srcdir = "test/null_str_test"
+includedir = "src"

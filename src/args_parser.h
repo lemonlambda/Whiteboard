@@ -2,6 +2,23 @@
 
 #include <stdbool.h>
 
-bool run(const char *arg, const char **build_name, bool build_mode);
-bool parse_args(int argc, const char **argv, bool *run_mode, bool *default_build, bool *quiet_mode, const char **build_name, char **run_args);
+typedef struct args {
+    const char **build_name;
+    char **run_args;
+    bool run_mode;
+    bool default_build;
+    bool build_mode;
+    bool clean_mode;
+    bool quiet_mode;
+    bool run_func;
+} args_t;
+
+const char *null_str(const char **value);
+
+args_t init_args();
+void free_args(args_t args);
+char *to_string(args_t *args);
+
+bool run(const char *arg, args_t *args);
+args_t parse_args(int argc, const char **argv);
 

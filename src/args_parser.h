@@ -3,8 +3,8 @@
 #include <stdbool.h>
 
 typedef struct args {
-    const char **build_name;
-    char **run_args;
+    const char *build_name;
+    char *run_args;
     bool run_mode;
     bool default_build;
     bool build_mode;
@@ -13,7 +13,7 @@ typedef struct args {
     bool run_func;
 } args_t;
 
-const char *null_str(const char **value);
+const char *null_str(const char *value);
 
 args_t init_args();
 void free_args(args_t args);

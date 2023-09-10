@@ -16,7 +16,7 @@ int main(int argc, const char **argv) {
 
     args_t args = parse_args(argc, argv);
     char *stringed = to_string(&args);
-    // printf("%s", stringed);
+    printf("%s\n", stringed);
     if (!args.run_func)
         errx(1, "You need to provide a sub-command of: `run`, `build` or `clean`");
 

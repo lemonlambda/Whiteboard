@@ -51,7 +51,7 @@ void build_bin(package_t *package, bin_t *bin, args_t args) {
 
     if (args.run_func) {
         char *run_f = "./%s/bin/%s-%s %s";
-        char run_bin_command[strlen(run_f) + strlen(target_dir_path) + strlen(package->name) + strlen(package->version) + strlen(*args.run_args) + 1];
+        char run_bin_command[strlen(run_f) + strlen(target_dir_path) + strlen(package->name) + strlen(package->version) + strlen(args.run_args) + 1];
         sprintf(run_bin_command, run_f, target_dir_path, bin->name, package->version, args.run_args);
         if (!args.quiet_mode)
             printf("%sRunning:%s %s\n", BHMAG, CRESET, run_bin_command);
@@ -87,7 +87,7 @@ void run_whiteboard(args_t args) {
             break;
         }
 
-        if (strcmp(value->name, *args.build_name) == 0) {
+        if (strcmp(value->name, args.build_name) == 0) {
             build_bin(&config.package, value, args);
             break;
         }

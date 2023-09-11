@@ -58,7 +58,7 @@ void make_bin(config_t *self, toml_table_t *toml) {
         if (!name.ok)
             errx(1, "There is no name for the bin");
         toml_datum_t default_bin = toml_bool_in(table, "default");
-        if (!default_bin.ok)
+        if (default_bin.ok)
             bin->default_bin = (bool)default_bin.u.b;
 
         // Dirs

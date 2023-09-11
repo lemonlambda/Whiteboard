@@ -14,6 +14,7 @@ args_t init_args() {
     args.default_build = true;
     args.quiet_mode = false;
     args.run_func = false;
+    args.clean_mode = false;
     args.build_name = calloc(0, sizeof(const char *));
     args.run_args = calloc(0, sizeof(char *));
     return args;
@@ -60,7 +61,6 @@ args_t parse_args(int argc, const char **argv) {
     bool build_mode = false;
     for (int i = 0; i < argc; i++) {
         const char *arg = argv[i];
-        printf("%s\n", arg);
 
         if (strcmp(arg, "--quiet") == 0) {
             args.quiet_mode = true;

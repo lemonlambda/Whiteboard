@@ -49,7 +49,7 @@ void build_bin(package_t *package, bin_t *bin, args_t *args) {
     if (system(link_objs_command) == -1)
         errx(1, "Recieved Error in `Linking` stage");
 
-    if (args->run_func) {
+    if (args->run_mode) {
         char *run_f = "./%s/bin/%s-%s %s";
         char run_bin_command[strlen(run_f) + strlen(target_dir_path) + strlen(package->name) + strlen(package->version) + strlen(args->run_args) + 1];
         sprintf(run_bin_command, run_f, target_dir_path, bin->name, package->version, args->run_args);

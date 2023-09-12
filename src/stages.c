@@ -25,3 +25,22 @@ stage_t init_stage(char *name) {
 void free_stage(stage_t self) {
     free_vector(self.commands);
 }
+
+// Default stages
+stage_t run_stage() {
+    stage_t stage = init_stage()
+
+    return stage;
+}
+
+stage_t build_stage() {
+    stage_t stage = run_stage()
+
+    return stage;
+}
+
+stage_t clean_stage() {
+    stage_t stage = init_stage()
+    
+    return stage;
+}

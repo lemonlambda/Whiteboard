@@ -27,13 +27,26 @@ void free_stage(stage_t self) {
 }
 
 // Default stages
-stage_t build_stage(char *default) {
+stage_t build_stage(char *def) {
     stage_t stage;
-    if (char == NULL) {
+    if (def == NULL) {
         stage = init_stage("Build");
     } else {
-        stage = init_stage(default);
+        stage = init_stage(def);
     }
+
+    // Very fun and not annoying platform specific build instructions
+    #ifdef __WIN32
+        stage.callbacks.add_stage(&stage, new_command("Make Dirs", "mkdir {targetdir} && mkdir {targetdir}\\{projectname} && mkdir {targetdir}\\{projectname}\\obj && mkdir {targetdir}\\{projectname}\\bin"));
+        stage.callbacks.add_stage(&stage, new_command("Compilation", "gcc -O2 -c {srcdir}\\* -I {includedir}"));
+        stage.callbacks.add_stage(&stage, new_command("Moving Objects", "mv *.o {targetdir}\\{projectname}\\obj"));
+        stage.callbacks.add_stage(&stage, new_command("Linking", "gcc -B gcc {targetdir}\\{projectname}\\obj\\* -o {targetdir}\\{projectname}\\bin\\{binname}-{projectversion}"));
+    #else
+        stage.callbacks.add_stage(&stage, new_command("Make Dirs", "mkdir -p {targetdir}/{projectname}/obj {targetdir}/{projectname}/bin"));
+        stage.callbacks.add_stage(&stage, new_command("Compilation", "gcc -O2 -c {srcdir}/* -I {includedir}"));
+        stage.callbacks.add_stage(&stage, new_command("Moving Objects", "mv *.o {targetdir}/{projectname}/obj"));
+        stage.callbacks.add_stage(&stage, new_command("Linking", "gcc -B gcc {targetdir}/{projectname}/obj/* -o {targetdir}/{projectname}/bin/{binname}-{projectversion}"));
+    #endif
 
     return stage;
 }
@@ -41,18 +54,23 @@ stage_t build_stage(char *default) {
 stage_t run_stage() {
     stage_t stage = build_stage("Run");
 
-// Very fun and not annoying platform specific build instructions
-#ifdef __WIN32
-    stage.callbacks.add_stage(&stage, new_command("Make Dirs", "mkdir {srcdir} && mkdir {srcdir}\\{projectname} && mkdir {srcdir}\\{projectname}\\obj && mkdir {srcdir}\\{projectname}\\bin"));
-#else
-    stage.callbacks.add_stage(&stage, new_command("Make Dirs", "mkdir {srcdir} && mkdir {srcdir}/{projectname} && mkdir {srcdir}/{projectname}/obj && mkdir {srcdir}/{projectname}/bin"));
-#endif
+    #ifdef __WIN32
+        stage.callbacks.add_stage(&stage, new_command("Run", ".\\{target_dir}\\{projectname}\\bin\\{binname}-{projectversion}"));
+    #else
+        stage.callbacks.add_stage(&stage, new_command("Run", "./{target_dir}/{projectname}/bin/{binname}-{projectversion}"))
+    #endif
 
     return stage;
 }
 
 stage_t clean_stage() {
     stage_t stage = init_stage("Clean");
+
+    #ifdef __WIN32
+        stage.callbacks.add_stage(&stage, new_command("Remove Target", "rmdir .\\{targetdir}"));
+    #else
+        stage.callbacks.add_stage(&stage, new_command("Remove Target", "rm -r ./{targetdir}"));
+    #endif
     
     return stage;
 }

@@ -12,70 +12,89 @@ char *replace_args(command_t *cmd, package_t *project, bin_t *bin);
 
 void add_stage(stage_t *self, command_t cmd) {
     command_t *malloced = malloc(sizeof(command_t));
+    assert(malloced != NULL);
     *malloced = cmd;
 
-    vector_t *commands = &self->commands;
-    commands->callbacks.push(commands, (void *)malloced);
+    self->commands.callbacks.push(&self->commands, (void *)malloced);
 }
 
 void run_stages(stage_t *self, package_t *project, bin_t *bin) {
+    printf("Hello?\n");
     vector_t commands = self->commands;
-    
-    for (int i = 0; ; i++) {
+
+    printf("Before loop\n");
+    for (int i = 0; true; i++) {
         command_t *cmd = (command_t *)commands.callbacks.get(&commands, i);
         if (!cmd)
             break;
 
-        printf("Before: %s\n", cmd);
+        printf("Before: %s\n", cmd->command);
         char *replaced = replace_args(cmd, project, bin);
         printf("Before: %s\n", replaced);
     }
+    printf("After loop\n");
 }
 
 stage_t init_stage(char *name) {
     assert(name != NULL);
     
     stage_t stage;
-    stage.stage_name = name;
+    stage.stage_name = strdup(name);
     stage.commands = init_vector();
     stage.callbacks.add_stage = &add_stage;
     stage.callbacks.run_stages = &run_stages;
 }
 
 void free_stage(stage_t self) {
+    free(self.stage_name);
     free_vector(self.commands);
 }
 
 // Default stages
 stage_t build_stage(char *def) {
+    printf("Do I die here 2?\n");
+    fflush(stdout);
     stage_t stage;
     if (def == NULL) {
         stage = init_stage("Build");
     } else {
         stage = init_stage(def);
     }
+    printf("Do I die here 3?\n");
+    fflush(stdout);
 
     // Very fun and not annoying platform specific build instructions
-    #ifdef WIN32
+    #ifndef WIN32
+        printf("Windows!\n");
+        fflush(stdout);
         stage.callbacks.add_stage(&stage, new_command("Make Dirs", "mkdir {targetdir} && mkdir {targetdir}\\{projectname} && mkdir {targetdir}\\{projectname}\\obj && mkdir {targetdir}\\{projectname}\\bin"));
         stage.callbacks.add_stage(&stage, new_command("Compilation", "gcc -O2 -c {srcdir}\\* -I {includedir}"));
         stage.callbacks.add_stage(&stage, new_command("Moving Objects", "mv *.o {targetdir}\\{projectname}\\obj"));
         stage.callbacks.add_stage(&stage, new_command("Linking", "gcc -B gcc {targetdir}\\{projectname}\\obj\\* -o {targetdir}\\{projectname}\\bin\\{binname}-{projectversion}"));
     #else
+        printf("Not Windows!\n");
+        fflush(stdout);
         stage.callbacks.add_stage(&stage, new_command("Make Dirs", "mkdir -p {targetdir}/{projectname}/obj {targetdir}/{projectname}/bin"));
         stage.callbacks.add_stage(&stage, new_command("Compilation", "gcc -O2 -c {srcdir}/* -I {includedir}"));
         stage.callbacks.add_stage(&stage, new_command("Moving Objects", "mv *.o {targetdir}/{projectname}/obj"));
         stage.callbacks.add_stage(&stage, new_command("Linking", "gcc -B gcc {targetdir}/{projectname}/obj/* -o {targetdir}/{projectname}/bin/{binname}-{projectversion}"));
     #endif
+    
+    printf("Do I die here 4?\n");
+    fflush(stdout);
 
     return stage;
 }
 
 stage_t run_stage() {
+    printf("Do I even exist?\n");
+    fflush(stdout);
     stage_t stage = build_stage("Run");
-
-    #ifdef WIN32
-         stage.callbacks.add_stage(&stage, new_command("Run", ".\\{targetdir}\\{projectname}\\bin\\{binname}-{projectversion}"));
+    printf("Do I die here?\n");
+    fflush(stdout);
+    
+    #ifndef WIN32
+        stage.callbacks.add_stage(&stage, new_command("Run", ".\\{targetdir}\\{projectname}\\bin\\{binname}-{projectversion}"));
     #else
         stage.callbacks.add_stage(&stage, new_command("Run", "./{targetdir}/{projectname}/bin/{binname}-{projectversion}"));
     #endif
@@ -86,7 +105,7 @@ stage_t run_stage() {
 stage_t clean_stage() {
     stage_t stage = init_stage("Clean");
 
-    #ifdef WIN32
+    #ifndef WIN32
         stage.callbacks.add_stage(&stage, new_command("Remove Target", "rmdir .\\{targetdir}"));
     #else
         stage.callbacks.add_stage(&stage, new_command("Remove Target", "rm -r ./{targetdir}"));

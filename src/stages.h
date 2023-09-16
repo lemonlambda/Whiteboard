@@ -13,7 +13,7 @@ typedef struct stage {
 
     struct {
         void (*add_stage)(struct stage *, command_t );
-        void (*run_stages)(struct stage *, package_t *project, bin_t *bin);
+        void (*run_stages)(struct stage *, package_t *, bin_t *);
     } callbacks;
 } stage_t;
 

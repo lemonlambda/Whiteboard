@@ -12,14 +12,17 @@
 
 void build_bin(package_t *package, bin_t *bin, args_t *args) {
     if (args->build_mode) {
+        printf("In build\n");
         stage_t stage = build_stage(NULL);
         stage.callbacks.run_stages(&stage, package, bin);
     }
     if (args->run_mode) {
+        printf("In run\n");
         stage_t stage = run_stage();
         stage.callbacks.run_stages(&stage, package, bin);
     }
     if (args->clean_mode) {
+        printf("In clean\n");
         stage_t stage = clean_stage();
         stage.callbacks.run_stages(&stage, package, bin);
     }

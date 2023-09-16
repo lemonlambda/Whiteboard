@@ -26,7 +26,7 @@ void build_bin(package_t *package, bin_t *bin, args_t *args) {
         stage_t stage = clean_stage();
         stage.callbacks.run_stages(&stage, package, bin);
     }
-    errx(1, "Not valid modes inputted into `build_bin`");
+    errx(1, "No valid modes inputted into `build_bin`");
 }
 
 void run_whiteboard(args_t *args) {

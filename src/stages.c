@@ -21,7 +21,6 @@ void add_stage(stage_t *self, command_t cmd) {
 void run_stages(stage_t *self, package_t *project, bin_t *bin) {
     vector_t commands = self->commands;
 
-    printf("Before loop\n");
     for (int i = 0; true; i++) {
         command_t *cmd = (command_t *)commands.callbacks.get(&commands, i);
         if (!cmd)
@@ -29,7 +28,6 @@ void run_stages(stage_t *self, package_t *project, bin_t *bin) {
 
         char *replaced = replace_args(cmd, project, bin);
     }
-    printf("After loop\n");
 }
 
 stage_t init_stage(char *name) {
@@ -50,7 +48,6 @@ void free_stage(stage_t self) {
 
 // Default stages
 stage_t build_stage(char *def) {
-    printf("Do I die here 2?\n");
     fflush(stdout);
     stage_t stage;
     if (def == NULL) {
@@ -58,19 +55,16 @@ stage_t build_stage(char *def) {
     } else {
         stage = init_stage(def);
     }
-    printf("Do I die here 3?\n");
     fflush(stdout);
 
     // Very fun and not annoying platform specific build instructions
     #ifndef WIN32
-        printf("Windows!\n");
         fflush(stdout);
         stage.callbacks.add_stage(&stage, new_command("Make Dirs", "mkdir {targetdir} && mkdir {targetdir}\\{projectname} && mkdir {targetdir}\\{projectname}\\obj && mkdir {targetdir}\\{projectname}\\bin"));
         stage.callbacks.add_stage(&stage, new_command("Compilation", "gcc -O2 -c {srcdir}\\* -I {includedir}"));
         stage.callbacks.add_stage(&stage, new_command("Moving Objects", "mv *.o {targetdir}\\{projectname}\\obj"));
         stage.callbacks.add_stage(&stage, new_command("Linking", "gcc -B gcc {targetdir}\\{projectname}\\obj\\* -o {targetdir}\\{projectname}\\bin\\{binname}-{projectversion}"));
     #else
-        printf("Not Windows!\n");
         fflush(stdout);
         stage.callbacks.add_stage(&stage, new_command("Make Dirs", "mkdir -p {targetdir}/{projectname}/obj {targetdir}/{projectname}/bin"));
         stage.callbacks.add_stage(&stage, new_command("Compilation", "gcc -O2 -c {srcdir}/* -I {includedir}"));
@@ -78,17 +72,14 @@ stage_t build_stage(char *def) {
         stage.callbacks.add_stage(&stage, new_command("Linking", "gcc -B gcc {targetdir}/{projectname}/obj/* -o {targetdir}/{projectname}/bin/{binname}-{projectversion}"));
     #endif
     
-    printf("Do I die here 4?\n");
     fflush(stdout);
 
     return stage;
 }
 
 stage_t run_stage() {
-    printf("Do I even exist?\n");
     fflush(stdout);
     stage_t stage = build_stage("Run");
-    printf("Do I die here?\n");
     fflush(stdout);
     
     #ifndef WIN32

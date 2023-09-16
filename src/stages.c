@@ -19,7 +19,6 @@ void add_stage(stage_t *self, command_t cmd) {
 }
 
 void run_stages(stage_t *self, package_t *project, bin_t *bin) {
-    printf("Hello?\n");
     vector_t commands = self->commands;
 
     printf("Before loop\n");
@@ -28,9 +27,7 @@ void run_stages(stage_t *self, package_t *project, bin_t *bin) {
         if (!cmd)
             break;
 
-        printf("Before: %s\n", cmd->command);
         char *replaced = replace_args(cmd, project, bin);
-        printf("Before: %s\n", replaced);
     }
     printf("After loop\n");
 }
@@ -43,6 +40,7 @@ stage_t init_stage(char *name) {
     stage.commands = init_vector();
     stage.callbacks.add_stage = &add_stage;
     stage.callbacks.run_stages = &run_stages;
+    return stage;
 }
 
 void free_stage(stage_t self) {
@@ -162,7 +160,7 @@ usize find_size(char *cmd, package_t *project, bin_t *bin) {
     usize count_projectname = count_string(cmd, "{projectversion}");
     usize count_projectversion = count_string(cmd, "{projectname}");
 
-    usize length;
+    usize length = 0;
 
     length += count_targetdir * strlen(bin->targetdir);
     length += count_binname * strlen(bin->name);

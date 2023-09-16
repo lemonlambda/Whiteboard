@@ -57,6 +57,7 @@ char *strrepall(char *orig, char *rep, char *with) {
     char *new = "";
     char *result = orig;
     while (strcmp(new, result) != 0) {
+        new = result;
         result = strrep(result, rep, with);
     }
     return strdup(result);

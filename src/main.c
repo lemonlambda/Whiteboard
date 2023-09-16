@@ -16,9 +16,9 @@ int main(int argc, const char **argv) {
 
     args_t args = parse_args(argc, argv);
     // Debuug stuff essentially
-    // char *stringed = to_string(&args);
-    // printf("%s\n", stringed);
-    // free(stringed);
+    char *stringed = to_string(&args);
+    printf("%s\n", stringed);
+    free(stringed);
     if (!args.run_func)
         errx(1, "You need to provide a sub-command of: `run`, `build` or `clean`");
 

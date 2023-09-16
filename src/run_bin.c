@@ -8,56 +8,22 @@
 #include "toml_format.h"
 #include "run_bin.h"
 #include "color_codes.h"
+#include "stages.h"
 
 void build_bin(package_t *package, bin_t *bin, args_t *args) {
-    // Make the required target dirs
-    char target_dir_path[strlen(bin->targetdir) + strlen(package->name) + 2];
-    sprintf(target_dir_path, "%s/%s", bin->targetdir, package->name);
-    char *mkdir_f = "mkdir %s/obj && mkdir %s/bin";
-    char *make_dirs_command = malloc(sizeof(char) * (strlen(mkdir_f) + strlen(target_dir_path) * 2 + 2));
-    sprintf(make_dirs_command, mkdir_f, target_dir_path, target_dir_path);
-    if (!args->quiet_mode)
-        printf("%sMaking Dirs:%s %s\n", BHMAG, CRESET, make_dirs_command);
-    if (system(make_dirs_command) == -1)
-        errx(1, "Recieved Error in `Making Dirs` stage");
-
-    // Make the objs
-    char *obj_f = "gcc -O2 -c $(find %s -name \"*.c\") -I %s";
-    char compile_objs_command[strlen(obj_f) + strlen(bin->includedir) + strlen(bin->srcdir) + 1];
-    assert(compile_objs_command != NULL);
-    sprintf(compile_objs_command, obj_f, bin->srcdir, bin->includedir);
-    if (!args->quiet_mode)
-        printf("%sCompiling:%s %s\n", BHMAG, CRESET, compile_objs_command);
-    if (system(compile_objs_command) == -1)
-        errx(1, "Recieved Error in `Compiling` stage");
-
-    // Move all the objs
-    char *move_f = "mv *.o %s/obj";
-    char move_objs_command[strlen(move_f) + strlen(target_dir_path) + 1];
-    sprintf(move_objs_command, move_f, target_dir_path);
-    if (!args->quiet_mode)
-        printf("%sMoving:%s %s\n", BHMAG, CRESET, move_objs_command);
-    if (system(move_objs_command) == -1)
-        errx(1, "Recieved Error in `Moving` stage");
-
-    // Link the objs
-    char *link_f = "gcc -B gcc $(find %s/obj -name \"*.o\") -o %s/bin/%s-%s";
-    char link_objs_command[strlen(link_f) + strlen(target_dir_path) * 2 + strlen(package->name) + strlen(package->version) + 1];
-    sprintf(link_objs_command, link_f, target_dir_path, target_dir_path, bin->name, package->version);
-    if (!args->quiet_mode)
-        printf("%sLinking:%s %s\n", BHMAG, CRESET, link_objs_command);
-    if (system(link_objs_command) == -1)
-        errx(1, "Recieved Error in `Linking` stage");
-
-    if (args->run_mode) {
-        char *run_f = "./%s/bin/%s-%s %s";
-        char run_bin_command[strlen(run_f) + strlen(target_dir_path) + strlen(package->name) + strlen(package->version) + strlen(args->run_args) + 1];
-        sprintf(run_bin_command, run_f, target_dir_path, bin->name, package->version, args->run_args);
-        if (!args->quiet_mode)
-            printf("%sRunning:%s %s\n", BHMAG, CRESET, run_bin_command);
-        if (system(run_bin_command) == -1)
-            errx(1, "Recieved Error in `Linking` stage");
+    if (args->build_mode) {
+        stage_t stage = build_stage(NULL);
+        stage.callbacks.run_stages(&stage, package, bin);
     }
+    if (args->run_mode) {
+        stage_t stage = run_stage();
+        stage.callbacks.run_stages(&stage, package, bin);
+    }
+    if (args->clean_mode) {
+        stage_t stage = clean_stage();
+        stage.callbacks.run_stages(&stage, package, bin);
+    }
+    errx(1, "Not valid modes inputted into `build_bin`");
 }
 
 void run_whiteboard(args_t *args) {

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 // You must free the result if result is non-NULL.
 char *strrep(char *orig, char *rep, char *with) {
     char *result; // the return string
@@ -49,5 +50,15 @@ char *strrep(char *orig, char *rep, char *with) {
     }
     strcpy(tmp, orig);
     return result;
+}
+
+// Replaces all instances of rcep with with
+char *strrepall(char *orig, char *rep, char *with) {
+    char *new = "";
+    char *result = orig;
+    while (strcmp(new, result) != 0) {
+        result = strrep(result, rep, with);
+    }
+    return strdup(result);
 }
 

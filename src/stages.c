@@ -64,12 +64,12 @@ stage_t build_stage(char *def) {
     fflush(stdout);
 
     // Very fun and not annoying platform specific build instructions
-    #ifndef WIN32
+    #ifdef WIN32
         fflush(stdout);
         stage.callbacks.add_stage(&stage, new_command("Make Dirs", "mkdir {targetdir} && mkdir {targetdir}\\{projectname} && mkdir {targetdir}\\{projectname}\\obj && mkdir {targetdir}\\{projectname}\\bin"));
         stage.callbacks.add_stage(&stage, new_command("Compilation", "gcc -O2 -Wall -Wextra -c {srcfiles} -I {includedir}"));
         stage.callbacks.add_stage(&stage, new_command("Moving Objects", "mv *.o {targetdir}\\{projectname}\\obj"));
- e        stage.callbacks.add_stage(&stage, new_command("Linking", "gcc -B gcc {targetdir}\\{projectname}\\obj\\* -o {targetdir}\\{projectname}\\bin\\{binname}-{projectversion}"));
+        stage.callbacks.add_stage(&stage, new_command("Linking", "gcc -B gcc {targetdir}\\{projectname}\\obj\\* -o {targetdir}\\{projectname}\\bin\\{binname}-{projectversion}"));
     #else
         fflush(stdout);
         stage.callbacks.add_stage(&stage, new_command("Make Dirs", "mkdir -p {targetdir}/{projectname} && mkdir -p {targetdir}/{projectname}/obj {targetdir}/{projectname}/bin"));
@@ -88,7 +88,7 @@ stage_t run_stage() {
     stage_t stage = build_stage("Run");
     fflush(stdout);
     
-    #ifndef WIN32
+    #ifdef WIN32
         stage.callbacks.add_stage(&stage, new_command("Run", ".\\{targetdir}\\{projectname}\\bin\\{binname}-{projectversion}"));
     #else
         stage.callbacks.add_stage(&stage, new_command("Run", "./{targetdir}/{projectname}/bin/{binname}-{projectversion}"));
@@ -100,7 +100,7 @@ stage_t run_stage() {
 stage_t clean_stage() {
     stage_t stage = init_stage("Clean");
 
-    #ifndef WIN32
+    #ifdef WIN32
         stage.callbacks.add_stage(&stage, new_command("Remove Target", "rmdir .\\{targetdir}"));
     #else
         stage.callbacks.add_stage(&stage, new_command("Remove Target", "rm -rf ./{targetdir}"));
@@ -177,7 +177,7 @@ char *get_source_files(bin_t *bin) {
             continue;
         else if (!(en->d_name[length - 1] == 'c' && en->d_name[length - 2] == '.'))
             continue;
-        #ifndef WIN32
+        #ifdef WIN32
             if (!first_run) {
                 char *copied = strdup(src_dir);
                 sprintf(src_dir, "%s %s\\%s", copied, bin->srcdir, en->d_name);

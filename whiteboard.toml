@@ -11,7 +11,7 @@ includedir = "src"
 name = "Stable"
 includedir = "src"
 
-[[bin]]
-name = "NullStrTest"
-srcdir = "test/null_str_test"
-includedir = "src"
+[[test]]
+name = "example_test"
+srcdir = "tests/example_test"
+includedir = "tests/example_test"

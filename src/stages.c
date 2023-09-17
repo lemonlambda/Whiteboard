@@ -4,9 +4,13 @@
 #include "rust_types.h"
 #include "toml_format.h"
 #include "platform_specific.h"
+#include "color_codes.h"
 
 #include <string.h>
 #include <assert.h>
+#include <dirent.h>
+
+#define streq(str1, str2) strcmp(str1, str2) == 0
 
 char *replace_args(command_t *cmd, package_t *project, bin_t *bin);
 
@@ -27,6 +31,8 @@ void run_stages(stage_t *self, package_t *project, bin_t *bin) {
             break;
 
         char *replaced = replace_args(cmd, project, bin);
+        printf("%sStage %s%s%s:%s %s\n", BHMAG, BHGRN, cmd->name, BHMAG, CRESET, replaced);
+        system(replaced);
     }
 }
 
@@ -61,13 +67,13 @@ stage_t build_stage(char *def) {
     #ifndef WIN32
         fflush(stdout);
         stage.callbacks.add_stage(&stage, new_command("Make Dirs", "mkdir {targetdir} && mkdir {targetdir}\\{projectname} && mkdir {targetdir}\\{projectname}\\obj && mkdir {targetdir}\\{projectname}\\bin"));
-        stage.callbacks.add_stage(&stage, new_command("Compilation", "gcc -O2 -c {srcdir}\\* -I {includedir}"));
+        stage.callbacks.add_stage(&stage, new_command("Compilation", "gcc -O2 -c {srcfiles} -I {includedir}"));
         stage.callbacks.add_stage(&stage, new_command("Moving Objects", "mv *.o {targetdir}\\{projectname}\\obj"));
-        stage.callbacks.add_stage(&stage, new_command("Linking", "gcc -B gcc {targetdir}\\{projectname}\\obj\\* -o {targetdir}\\{projectname}\\bin\\{binname}-{projectversion}"));
+ e        stage.callbacks.add_stage(&stage, new_command("Linking", "gcc -B gcc {targetdir}\\{projectname}\\obj\\* -o {targetdir}\\{projectname}\\bin\\{binname}-{projectversion}"));
     #else
         fflush(stdout);
-        stage.callbacks.add_stage(&stage, new_command("Make Dirs", "mkdir -p {targetdir}/{projectname}/obj {targetdir}/{projectname}/bin"));
-        stage.callbacks.add_stage(&stage, new_command("Compilation", "gcc -O2 -c {srcdir}/* -I {includedir}"));
+        stage.callbacks.add_stage(&stage, new_command("Make Dirs", "mkdir -p {target}/{projectname} && mkdir -p {targetdir}/{projectname}/obj {targetdir}/{projectname}/bin"));
+        stage.callbacks.add_stage(&stage, new_command("Compilation", "gcc -O2 -c {srcfiles} -I {includedir}"));
         stage.callbacks.add_stage(&stage, new_command("Moving Objects", "mv *.o {targetdir}/{projectname}/obj"));
         stage.callbacks.add_stage(&stage, new_command("Linking", "gcc -B gcc {targetdir}/{projectname}/obj/* -o {targetdir}/{projectname}/bin/{binname}-{projectversion}"));
     #endif
@@ -97,7 +103,7 @@ stage_t clean_stage() {
     #ifndef WIN32
         stage.callbacks.add_stage(&stage, new_command("Remove Target", "rmdir .\\{targetdir}"));
     #else
-        stage.callbacks.add_stage(&stage, new_command("Remove Target", "rm -r ./{targetdir}"));
+        stage.callbacks.add_stage(&stage, new_command("Remove Target", "rm -rf ./{targetdir}"));
     #endif
     
     return stage;
@@ -123,6 +129,8 @@ void free_command(command_t cmd) {
 usize find_size(char *cmd, package_t *project, bin_t *bin);
 usize count_string(const char *str1, const char *str2);
 
+char *get_source_files(package_t *project, bin_t* bin);
+
 // Replaces the args like `{binname}` in commands to real things
 // WARN: You need to free the returning char *
 char *replace_args(command_t *cmd, package_t *project, bin_t *bin) {
@@ -137,7 +145,53 @@ char *replace_args(command_t *cmd, package_t *project, bin_t *bin) {
     format = strrepall(format, "{projectname}", project->name);
     format = strrepall(format, "{projectversion}", project->version);
 
+    // Let's get all of the flise in a dir and read the extensions too
+    char *src_files = get_source_files(project, bin);
+    format = strrepall(format, "{srcfiles}", src_files);
+    free(src_files);
+
     return format;
+}
+
+// Should free the result after done using
+char *get_source_files(package_t *project, bin_t *bin) {
+    usize current_size = 512;
+    char *src_dir = calloc(1, sizeof(char) * current_size);
+    DIR *dir;
+    bool first_run = true;
+    struct dirent *en;
+    dir = opendir(bin->srcdir);
+    assert(dir != NULL);
+    while ((en = readdir(dir)) != NULL) {
+        // Reallocate the string if it needs to be bigger
+        while (strlen(en->d_name) + strlen(src_dir) + 1 > current_size) {
+            current_size *= 2;
+            src_dir = realloc(src_dir, current_size);
+        }
+        // Skip all the useless shit
+        if (streq(en->d_name, ".") || streq(en->d_name, "..")) {
+            continue;
+        }
+        const usize length = strlen(en->d_name);
+        if (length <= 2)
+            continue;
+        else if (!(en->d_name[length - 1] == 'c' && en->d_name[length - 2] == '.'))
+            continue;
+        #ifndef WIN32
+            if (!first_run)
+                sprintf(src_dir, "%s %s\\%s", src_dir, bin->srcdir, en->d_name);
+            else
+                sprintf(src_dir, "%s\\%s", bin->srcdir, en->d_name);
+        #else
+            if (!first_run)
+                sprintf(src_dir, "%s %s/%s", src_dir, bin->srcdir, en->d_name);
+            else
+                sprintf(src_dir, "%s/%s", bin->srcdir, en->d_name);
+        #endif
+        first_run = false;
+    }
+    printf("PRINTED: `%s\n`", src_dir);
+    return src_dir;
 }
 
 // Finds the size of the resulting args

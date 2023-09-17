@@ -190,7 +190,6 @@ char *get_source_files(package_t *project, bin_t *bin) {
         #endif
         first_run = false;
     }
-    printf("PRINTED: `%s\n`", src_dir);
     return src_dir;
 }
 

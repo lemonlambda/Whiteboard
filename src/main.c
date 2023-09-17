@@ -10,15 +10,19 @@
 #include "toml.h"
 #include "toml_format.h"
 #include "args_parser.h"
+#include "debug.h"
 
 int main(int argc, const char **argv) {
     assert(argv != NULL);
 
     args_t args = parse_args(argc, argv);
-    // Debuug stuff essentially
-    char *stringed = to_string(&args);
-    printf("%s\n", stringed);
-    free(stringed);
+
+    #ifdef DEBUG
+        char *stringed = to_string(&args);
+        printf("%s\n", stringed);
+        free(stringed);
+    #endif
+    
     if (!args.run_func)
         errx(1, "You need to provide a sub-command of: `run`, `build` or `clean`");
 

@@ -36,7 +36,7 @@ typedef struct command {
 command_t new_command(char *name, char *cmd);
 void free_command(command_t cmd);
 
-char *get_source_files(package_t *project, bin_t* bin);
+char *get_source_files(bin_t* bin);
 char *replace_args(command_t *cmd, package_t *package, bin_t *bin);
 usize find_size(char *cmd, package_t *project, bin_t *bin);
 usize count_string(const char *str1, const char *str2);

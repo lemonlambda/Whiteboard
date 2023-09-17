@@ -129,7 +129,7 @@ void free_command(command_t cmd) {
 usize find_size(char *cmd, package_t *project, bin_t *bin);
 usize count_string(const char *str1, const char *str2);
 
-char *get_source_files(package_t *project, bin_t* bin);
+char *get_source_files(bin_t* bin);
 
 // Replaces the args like `{binname}` in commands to real things
 // WARN: You need to free the returning char *
@@ -146,7 +146,7 @@ char *replace_args(command_t *cmd, package_t *project, bin_t *bin) {
     format = strrepall(format, "{projectversion}", project->version);
 
     // Let's get all of the flise in a dir and read the extensions too
-    char *src_files = get_source_files(project, bin);
+    char *src_files = get_source_files(bin);
     format = strrepall(format, "{srcfiles}", src_files);
     free(src_files);
 
@@ -154,7 +154,7 @@ char *replace_args(command_t *cmd, package_t *project, bin_t *bin) {
 }
 
 // Should free the result after done using
-char *get_source_files(package_t *project, bin_t *bin) {
+char *get_source_files(bin_t *bin) {
     usize current_size = 512;
     char *src_dir = calloc(1, sizeof(char) * current_size);
     DIR *dir;
@@ -178,14 +178,18 @@ char *get_source_files(package_t *project, bin_t *bin) {
         else if (!(en->d_name[length - 1] == 'c' && en->d_name[length - 2] == '.'))
             continue;
         #ifndef WIN32
-            if (!first_run)
-                sprintf(src_dir, "%s %s\\%s", src_dir, bin->srcdir, en->d_name);
-            else
+            if (!first_run) {
+                char *copied = strdup(src_dir);
+                sprintf(src_dir, "%s %s\\%s", copied, bin->srcdir, en->d_name);
+                free(copied);
+            } else
                 sprintf(src_dir, "%s\\%s", bin->srcdir, en->d_name);
         #else
-            if (!first_run)
-                sprintf(src_dir, "%s %s/%s", src_dir, bin->srcdir, en->d_name);
-            else
+            if (!first_run) {
+                char *copied = strdup(src_dir);
+                sprintf(src_dir, "%s %s/%s", copied, bin->srcdir, en->d_name);
+                free(copied);
+            } else
                 sprintf(src_dir, "%s/%s", bin->srcdir, en->d_name);
         #endif
         first_run = false;
@@ -223,7 +227,7 @@ usize count_string(const char *str1, const char *str2) {
     
     usize count = 0;
     const char *tmp = str1;
-    while (tmp = strstr(tmp, str2)) {
+    while ((tmp = strstr(tmp, str2))) {
         count++;
         tmp++;
     }

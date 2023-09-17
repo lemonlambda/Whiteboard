@@ -11,6 +11,8 @@
 args_t init_args() {
     args_t args;
     args.run_mode = false;
+    args.build_mode = false;
+    args.clean_mode = false;
     args.default_build = true;
     args.quiet_mode = false;
     args.run_func = false;
@@ -28,12 +30,12 @@ char *to_string(args_t *args) {
     const char *null_build_name = null_str(args->build_name);
     const char *null_run_args = null_str(args->run_args);
 
-    char *format = "struct args \n{\n\tbuild_name: %s\n\trun_args: %s\n\trun_mode: %i\n\tdefault_build: %i\n\tquiet_mode: %i\n\trun_func: %i\n}";
+    char *format = "struct args \n{\n\tbuild_name: %s\n\trun_args: %s\n\trun_mode: %i\n\tbuild_mode: %i\n\tclean_mode: %i\n\tdefault_build: %i\n\tquiet_mode: %i\n\trun_func: %i\n}";
     char displayed[strlen(format) + strlen(null_build_name) + strlen(null_run_args) + 1 + 1 + 1 + 1 + 1];
     sprintf(
         displayed, 
         format,
-        null_build_name, null_run_args, args->run_mode, args->default_build, args->quiet_mode, args->run_func
+        null_build_name, null_run_args, args->run_mode, args->build_mode, args->clean_mode, args->default_build, args->quiet_mode, args->run_func
     );
     char *final = malloc(sizeof(char) * (strlen(displayed) + 1));
     strcpy(final, displayed);

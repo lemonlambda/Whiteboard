@@ -72,7 +72,7 @@ stage_t build_stage(char *def) {
  e        stage.callbacks.add_stage(&stage, new_command("Linking", "gcc -B gcc {targetdir}\\{projectname}\\obj\\* -o {targetdir}\\{projectname}\\bin\\{binname}-{projectversion}"));
     #else
         fflush(stdout);
-        stage.callbacks.add_stage(&stage, new_command("Make Dirs", "mkdir -p {target}/{projectname} && mkdir -p {targetdir}/{projectname}/obj {targetdir}/{projectname}/bin"));
+        stage.callbacks.add_stage(&stage, new_command("Make Dirs", "mkdir -p {targetdir}/{projectname} && mkdir -p {targetdir}/{projectname}/obj {targetdir}/{projectname}/bin"));
         stage.callbacks.add_stage(&stage, new_command("Compilation", "gcc -O2 -c {srcfiles} -I {includedir}"));
         stage.callbacks.add_stage(&stage, new_command("Moving Objects", "mv *.o {targetdir}/{projectname}/obj"));
         stage.callbacks.add_stage(&stage, new_command("Linking", "gcc -B gcc {targetdir}/{projectname}/obj/* -o {targetdir}/{projectname}/bin/{binname}-{projectversion}"));

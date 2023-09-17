@@ -12,7 +12,7 @@ gcc -B gcc target/Whiteboard/obj/* -o target/Whiteboard/bin/NewRelease-0.0.1.0
 Windows compilation (might be out of date so you might need to add some new C files to the command)
 ```
 mkdir target && mkdir target\Whiteboard && mkdir target\Whiteboard\obj && mkdir target\Whiteboard\bin
-gcc -O2 -Wall -Wextra -c src\args_parser.c src\main.c src\run_bin.c src\stages.c src\string_replace.c src\toml.c src\toml_format.c src\vector.c -I src                  _parser.c src/main.c src/run_bin.c src/stages.c src/string_replace.c src/toml.c src/toml_format.c src/vector.c
+gcc -O2 -Wall -Wextra -c src\args_parser.c src\main.c src\run_bin.c src\stages.c src\string_replace.c src\toml.c src\toml_format.c src\vector.c -I src
 mv *.o target\Whiteboard\obj
 gcc -B gcc target\Whiteboard\obj\* -o target\Whiteboard\bin\NewRelease-0.0.1.0
 ```

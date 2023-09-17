@@ -4,6 +4,9 @@
 #include <err.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <string.h>
+
+#define streq(str1, str2) strcmp(str1, str2) == 0
 
 // Inits a blank package
 package_t init_package() {
@@ -39,8 +42,8 @@ bin_t init_bin() {
     return bin;
 }
 
-void make_bin(config_t *self, toml_table_t *toml) {
-    toml_array_t *array = toml_array_in(toml, "bin");
+void make_bin(config_t *self, toml_table_t *toml, char *bin_name) {
+    toml_array_t *array = toml_array_in(toml, bin_name);
     if (!array) {
         errx(1, "Bins doesn't exist in whiteboard.toml");
     }
@@ -78,13 +81,19 @@ void make_bin(config_t *self, toml_table_t *toml) {
             errx(1, "Default bin already defined in bin: `%s`", name.u.s);
 
         bin->name = name.u.s;
-        self->bin.callbacks.push(&self->bin, bin);
+        if (streq(bin_name, "bin"))
+            self->bin.callbacks.push(&self->bin, bin);
+        else if (streq(bin_name, "test"))
+            self->test.callbacks.push(&self->test, bin);
+        else
+            errx(1, "Not a valid name for make_bin");
     }
 }
 
 void make_config(config_t *self, toml_table_t *toml) {
     self->package.callbacks.make_package(&self->package, toml);
-    self->callbacks.make_bin(self, toml);
+    self->callbacks.make_bin(self, toml, "bin");
+    self->callbacks.make_bin(self, toml, "test");
 }
 
 // Inits a blank config

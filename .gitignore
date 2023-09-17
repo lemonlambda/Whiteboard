@@ -2,3 +2,4 @@
 vgcore.*
 make.sh
 *.o
+*Bootstrap-*

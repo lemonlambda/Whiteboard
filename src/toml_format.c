@@ -43,7 +43,7 @@ bin_t init_bin() {
 }
 
 void make_bin(config_t *self, toml_table_t *toml, char *bin_name) {
-    toml_array_t *array = toml_array_in(toml, bin_name);
+    toml_array_t *array = toml_array_in(toml, strdup(bin_name));
     if (!array) {
         errx(1, "Bins doesn't exist in whiteboard.toml");
     }
@@ -101,6 +101,7 @@ config_t init_config() {
     config_t config;
     config.package = init_package();
     config.bin = init_vector();
+    config.test = init_vector();
     config.callbacks.make_bin = &make_bin;
     config.callbacks.make_config = &make_config;
     return config;

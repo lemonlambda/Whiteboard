@@ -5,11 +5,14 @@
 typedef struct args {
     const char *build_name;
     char *run_args;
-    bool run_mode;
     bool default_build;
+    
+    bool run_mode;
     bool build_mode;
     bool clean_mode;
     bool quiet_mode;
+    bool test_mode;
+    
     bool run_func;
 } args_t;
 

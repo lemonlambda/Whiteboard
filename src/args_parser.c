@@ -10,9 +10,12 @@
 
 args_t init_args() {
     args_t args;
+    
     args.run_mode = false;
     args.build_mode = false;
     args.clean_mode = false;
+    args.test_mode = false;
+    
     args.default_build = true;
     args.quiet_mode = false;
     args.run_func = false;
@@ -93,6 +96,12 @@ args_t parse_args(int argc, const char **argv) {
             if (strcmp(arg, "clean") == 0) {
                 args.clean_mode = true;
                 args.run_func = true;
+            }
+            if (strcmp(arg, "test") == 0) {
+                args.test_mode = true;
+                args.run_func = true;
+                if (argc < 3)
+                    errx(1, "You must provide the name of the test that you want to test");
             }
         }
     }

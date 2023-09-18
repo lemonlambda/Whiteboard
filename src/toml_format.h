@@ -24,6 +24,7 @@ typedef struct bin {
     char *srcdir;
     char *includedir;
     char *targetdir;
+    char *programincludedir;
 
     struct {
     } callbacks;

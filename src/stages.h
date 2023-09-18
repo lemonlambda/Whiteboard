@@ -21,6 +21,7 @@ typedef struct stage {
 stage_t run_stage();
 stage_t build_stage(char *def);
 stage_t clean_stage();
+stage_t test_stage();
 
 stage_t init_stage(char *name);
 void add_stage(stage_t *self, command_t cmd);

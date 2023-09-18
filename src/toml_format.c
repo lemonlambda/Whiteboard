@@ -1,5 +1,6 @@
 #include "toml_format.h"
 #include "vector.h"
+#include "platform_specific.h"
 
 #include <err.h>
 #include <stdbool.h>
@@ -37,8 +38,17 @@ bin_t init_bin() {
     bin.default_bin = false;
     bin.name = NULL;
     bin.srcdir = "src";
-    bin.includedir = "src/include";
-    bin.targetdir = "target";
+    #ifdef WIN32
+        bin.includedir = "src\\include";
+        bin.targetdir = "target";
+        // Used for tests
+        bin.programincludedir = "src\\include";
+    #else
+        bin.includedir = "src/include";
+        bin.targetdir = "target";
+        // Used for tests
+        bin.programincludedir = "src/include";
+    #endif
     return bin;
 }
 
@@ -74,6 +84,9 @@ void make_bin(config_t *self, toml_table_t *toml, char *bin_name) {
         toml_datum_t targetdir = toml_string_in(table, "targetdir");
         if (targetdir.ok)
             bin->targetdir = targetdir.u.s;
+        toml_datum_t programincludedir = toml_string_in(table, "programincludedir");
+        if (targetdir.ok)
+            bin->programincludedir = programincludedir.u.s;
 
         if (bin->default_bin && !default_defined_already)
             default_defined_already = true;

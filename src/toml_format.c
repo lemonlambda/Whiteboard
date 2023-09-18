@@ -1,6 +1,7 @@
 #include "toml_format.h"
 #include "vector.h"
 #include "platform_specific.h"
+#include "debug.h"
 
 #include <err.h>
 #include <stdbool.h>
@@ -33,6 +34,12 @@ void make_package(package_t *self, toml_table_t *toml) {
     self->version = version.u.s;
 }
 
+#ifdef DEBUG
+void print_bin(bin_t *self) {
+    printf("struct bin {\n\tdefault_bin: %d\n\tname: %s\n\tsrcdir: %s\n\tincludedir: %s\n\ttargetdir: %s\n\tprogramincludedir: %s\n", self->default_bin, self->name, self->srcdir, self->includedir, self->targetdir, self->programincludedir);
+}
+#endif
+
 bin_t init_bin() {
     bin_t bin;
     bin.default_bin = false;
@@ -48,6 +55,9 @@ bin_t init_bin() {
         bin.targetdir = "target";
         // Used for tests
         bin.programincludedir = "src/include";
+    #endif
+    #ifdef DEBUG
+        bin.callbacks.print_bin = &print_bin;
     #endif
     return bin;
 }

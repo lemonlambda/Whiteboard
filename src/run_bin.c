@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <err.h>
 
+#include "debug.h"
 #include "args_parser.h"
 #include "toml_format.h"
 #include "run_bin.h"
@@ -53,6 +54,10 @@ void run_whiteboard(args_t *args) {
             value = (bin_t *)config.bin.callbacks.get(&config.bin, i);
         else
             value = (bin_t *)config.test.callbacks.get(&config.bin, i);
+
+        #ifdef DEBUG
+            value->callbacks.print_bin(value);
+        #endif
 
         if (value == NULL && !value->default_bin) {
             errx(1, "Can't find a build by that name\n");

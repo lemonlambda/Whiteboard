@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 
+#include "debug.h"
 #include "rust_types.h"
 #include "vector.h"
 #include "toml.h"
@@ -27,10 +28,16 @@ typedef struct bin {
     char *programincludedir;
 
     struct {
+        #ifdef DEBUG
+        void (*print_bin)(struct bin *);
+        #endif
     } callbacks;
 } bin_t;
 
 bin_t init_bin();
+#ifdef DEBUG
+void print_bin(bin_t *self);
+#endif
 
 typedef struct config {
     package_t package;

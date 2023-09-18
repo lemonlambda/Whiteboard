@@ -36,7 +36,7 @@ void make_package(package_t *self, toml_table_t *toml) {
 
 #ifdef DEBUG
 void print_bin(bin_t *self) {
-    printf("struct bin {\n\tdefault_bin: %d\n\tname: %s\n\tsrcdir: %s\n\tincludedir: %s\n\ttargetdir: %s\n\tprogramincludedir: %s\n}", self->default_bin, self->name, self->srcdir, self->includedir, self->targetdir, self->programincludedir);
+    printf("struct bin {\n\tdefault_bin: %d\n\tname: %s\n\tsrcdir: %s\n\tincludedir: %s\n\ttargetdir: %s\n\tprogramincludedir: %s\n}\n", self->default_bin, self->name, self->srcdir, self->includedir, self->targetdir, self->programincludedir);
 }
 #endif
 

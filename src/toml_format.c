@@ -130,8 +130,7 @@ config_t init_config() {
     return config;
 }
 
-void free_config(config_t const self)
-{
+void free_config(config_t const self) {
 	free(self.package.name);
 	free(self.package.version);
 	for (size_t i = 0; i < self.bin.len; ++i) {
@@ -142,3 +141,4 @@ void free_config(config_t const self)
 	}
 	free_vector(self.bin);
 }
+

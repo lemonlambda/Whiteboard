@@ -154,10 +154,25 @@ config_t init_config() {
     return config;
 }
 
+void free_bin(bin_t const self)
+{
+	free(self.name);
+}
+
 void free_config(config_t const self) {
 	free(self.package.name);
 	free(self.package.version);
+	for (usize i = 0; i < self.bin.len; ++i) {
+		bin_t *pbin = self.bin.contents[i];
+		free_bin(*pbin);
+		free(pbin);
+	}
 	free_vector(self.bin);
+	for (usize i = 0; i < self.test.len; ++i) {
+		bin_t *pbin = self.test.contents[i];
+		free_bin(*pbin);
+		free(pbin);
+	}
 	free_vector(self.test);
 }
 

@@ -5,8 +5,10 @@ version = "0.0.1.0"
 [[bin]]
 default = true
 name = "NewRelease"
-ccargs = "-g -O2 -Wall -Wextra" # This should also be the default value if not provided
-ldargs = "-B gcc" # This should also be the default value if not provided
+cc = "gcc"
+ld = "gcc"
+ccargs = "-O2 -Wall -Wextra"
+ldargs = "-B gcc"
 includedir = "src"
 
 [[bin]]

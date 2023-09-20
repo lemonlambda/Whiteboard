@@ -163,23 +163,31 @@ char *replace_args(command_t *cmd, package_t *project, bin_t *bin) {
     char *format = strdup(cmd->command);
     format = realloc(format, find_size(cmd->command, project, bin) + 1);
 
-    format = strrepall(format, "{targetdir}", bin->targetdir);
-    format = strrepall(format, "{binname}", bin->name);
-    format = strrepall(format, "{srcdir}", bin->srcdir);
-    format = strrepall(format, "{includedir}", bin->includedir);
-    format = strrepall(format, "{programincludedir}", bin->programincludedir);
-    format = strrepall(format, "{cc}", bin->cc);
-    format = strrepall(format, "{ld}", bin->ld);
-    format = strrepall(format, "{ccargs}", bin->ccargs);
-    format = strrepall(format, "{ldargs}", bin->ldargs);
-    format = strrepall(format, "{projectname}", project->name);
-    format = strrepall(format, "{projectversion}", project->version);
+    // i hate this macro but each time strrepall leaks memory
+    char *new_format;
+#define UNHAPPY_REP(var, val) \
+        new_format = strrepall(format, "{" #var "}", val); \
+        free(format); \
+        format = new_format;
 
-    // Let's get all of the flise in a dir and read the extensions too
+    UNHAPPY_REP(targetdir, bin->targetdir);
+    UNHAPPY_REP(binname, bin->name);
+    UNHAPPY_REP(srcdir, bin->srcdir);
+    UNHAPPY_REP(includedir, bin->includedir);
+    UNHAPPY_REP(programincludedir, bin->programincludedir);
+    UNHAPPY_REP(cc, bin->cc);
+    UNHAPPY_REP(ld, bin->ld);
+    UNHAPPY_REP(ccargs, bin->ccargs);
+    UNHAPPY_REP(ldargs, bin->ldargs);
+    UNHAPPY_REP(projectname, project->name);
+    UNHAPPY_REP(projectversion, project->version);
+
+    // Let's get all of the files in a dir and read the extensions too
     char *src_files = get_source_files(bin);
-    format = strrepall(format, "{srcfiles}", src_files);
+    UNHAPPY_REP(srcfiles, src_files);
     free(src_files);
 
+#undef UNHAPPY_REP
     return format;
 }
 

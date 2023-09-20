@@ -48,12 +48,15 @@ void run_whiteboard(args_t *args) {
 
     config_t config = init_config();
     config.callbacks.make_config(&config, conf);
+
+    printf("\n%d\n\n", args->test_mode);
+    
     for (int i = 0; ; i++) {
         bin_t *value;
-        if (!args->test_mode)
-            value = (bin_t *)config.bin.callbacks.get(&config.bin, i);
+        if (args->test_mode)
+            value = (bin_t *)config.test.callbacks.get(&config.test, i);
         else
-            value = (bin_t *)config.test.callbacks.get(&config.bin, i);
+            value = (bin_t *)config.bin.callbacks.get(&config.bin, i);
 
         #ifdef DEBUG
             value->callbacks.print_bin(value);

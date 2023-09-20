@@ -49,7 +49,9 @@ void run_whiteboard(args_t *args) {
     config_t config = init_config();
     config.callbacks.make_config(&config, conf);
 
-    printf("\n%d\n\n", args->test_mode);
+    #ifdef DEBUG
+        printf("\n%d\n\n", args->test_mode);
+    #endif
     
     for (int i = 0; ; i++) {
         bin_t *value;

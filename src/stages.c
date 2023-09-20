@@ -220,6 +220,7 @@ char *get_source_files(bin_t *bin) {
         #endif
         first_run = false;
     }
+    closedir(dir);
     #ifdef DEBUG
         printf("SRC_FILES: %s\n", src_dir);
     #endif

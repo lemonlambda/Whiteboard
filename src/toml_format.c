@@ -102,7 +102,7 @@ void make_bin(config_t *self, toml_table_t *toml, char *bin_name) {
         if (targetdir.ok)
             bin->targetdir = targetdir.u.s;
         toml_datum_t programincludedir = toml_string_in(table, "programincludedir");
-        if (targetdir.ok)
+        if (programincludedir.ok)
             bin->programincludedir = programincludedir.u.s;
 
         if (bin->default_bin && !default_defined_already)

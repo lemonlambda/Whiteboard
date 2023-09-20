@@ -68,7 +68,7 @@ void make_bin(config_t *self, toml_table_t *toml, char *bin_name) {
     #endif
     toml_array_t *array = toml_array_in(toml, strdup(bin_name));
     if (!array)
-        errx(1, "Bins doesn't exist in whiteboard.toml");
+        errx(1, "%s doesn't exist in whiteboard.toml", bin_name);
     bool default_defined_already = false;
 
     for (int i = 0; ; i++) {
@@ -106,7 +106,7 @@ void make_bin(config_t *self, toml_table_t *toml, char *bin_name) {
             errx(1, "Default bin already defined in bin: `%s`", name.u.s);
 
         bin->name = name.u.s;
-        #if DEBUG
+        #ifdef DEBUG
             bin->callbacks.print_bin(bin);
         #endif
         if (streq(bin_name, "bin"))

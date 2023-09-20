@@ -44,21 +44,21 @@ bin_t init_bin() {
     bin_t bin;
     bin.default_bin = false;
     bin.name = NULL;
-    bin.srcdir = "src";
-    bin.cc = "gcc";
-    bin.ld = "gcc";
-    bin.ccargs = "-O2 -Wall -Wextra"; // defaults as per issue/PR #8
-    bin.ldargs = "-B gcc";
+    bin.srcdir = strdup("src");
+    bin.cc = strdup("gcc");
+    bin.ld = strdup("gcc");
+    bin.ccargs = strdup("-O2 -Wall -Wextra"); // defaults as per issue/PR #8
+    bin.ldargs = strdup("-B gcc");
     #ifdef WIN32
-        bin.includedir = "src\\include";
-        bin.targetdir = "target";
+        bin.includedir = strdup("src\\include");
+        bin.targetdir = strdup("target");
         // Used for tests
-        bin.programincludedir = "src\\include";
+        bin.programincludedir = strdup("src\\include");
     #else
-        bin.includedir = "src/include";
-        bin.targetdir = "target";
+        bin.includedir = strdup("src/include");
+        bin.targetdir = strdup("target");
         // Used for tests
-        bin.programincludedir = "src/include";
+        bin.programincludedir = strdup("src/include");
     #endif
     #ifdef DEBUG
         bin.callbacks.print_bin = &print_bin;
@@ -70,7 +70,7 @@ void make_bin(config_t *self, toml_table_t *toml, char *bin_name) {
     #ifdef DEBUG
         printf("BIN Name: %s\n", bin_name);
     #endif
-    toml_array_t *array = toml_array_in(toml, strdup(bin_name));
+    toml_array_t *array = toml_array_in(toml, bin_name);
     // Early return because said thing doesn't exist in the toml
     if (!array)
         return;
@@ -93,17 +93,25 @@ void make_bin(config_t *self, toml_table_t *toml, char *bin_name) {
 
         // Dirs
         toml_datum_t srcdir = toml_string_in(table, "srcdir");
-        if (srcdir.ok)
+        if (srcdir.ok) {
+	    free(bin->srcdir);
             bin->srcdir = srcdir.u.s;
+	}
         toml_datum_t includedir = toml_string_in(table, "includedir");
-        if (includedir.ok)
+        if (includedir.ok) {
+	    free(bin->includedir);
             bin->includedir = includedir.u.s;
+	}
         toml_datum_t targetdir = toml_string_in(table, "targetdir");
-        if (targetdir.ok)
+        if (targetdir.ok) {
+	    free(bin->targetdir);
             bin->targetdir = targetdir.u.s;
+	}
         toml_datum_t programincludedir = toml_string_in(table, "programincludedir");
-        if (targetdir.ok)
+        if (programincludedir.ok) {
+	    free(bin->programincludedir);
             bin->programincludedir = programincludedir.u.s;
+	}
 
         if (bin->default_bin && !default_defined_already)
             default_defined_already = true;
@@ -112,17 +120,25 @@ void make_bin(config_t *self, toml_table_t *toml, char *bin_name) {
 
 	// Compiler & Linker
 	toml_datum_t cc = toml_string_in(table, "cc");
-	if (cc.ok)
+	if (cc.ok) {
+		free(bin->cc);
 		bin->cc = cc.u.s;
+	}
 	toml_datum_t ld = toml_string_in(table, "ld");
-	if (ld.ok)
+	if (ld.ok) {
+		free(bin->ld);
 		bin->ld = ld.u.s;
+	}
 	toml_datum_t ccargs = toml_string_in(table, "ccargs");
-	if (ccargs.ok)
+	if (ccargs.ok) {
+		free(bin->ccargs);
 		bin->ccargs = ccargs.u.s;
+	}
 	toml_datum_t ldargs = toml_string_in(table, "ldargs");
-	if (ldargs.ok)
+	if (ldargs.ok) {
+		free(bin->ldargs);
 		bin->ldargs = ldargs.u.s;
+	}
 
         bin->name = name.u.s;
         #ifdef DEBUG
@@ -154,10 +170,34 @@ config_t init_config() {
     return config;
 }
 
+void free_bin(bin_t const self)
+{
+	if (self.name != NULL)
+		free(self.name);
+	free(self.cc);
+	free(self.ld);
+	free(self.ccargs);
+	free(self.ldargs);
+	free(self.srcdir);
+	free(self.includedir);
+	free(self.targetdir);
+	free(self.programincludedir);
+}
+
 void free_config(config_t const self) {
 	free(self.package.name);
 	free(self.package.version);
+	for (usize i = 0; i < self.bin.len; ++i) {
+		bin_t *pbin = self.bin.contents[i];
+		free_bin(*pbin);
+		free(pbin);
+	}
 	free_vector(self.bin);
+	for (usize i = 0; i < self.test.len; ++i) {
+		bin_t *pbin = self.test.contents[i];
+		free_bin(*pbin);
+		free(pbin);
+	}
 	free_vector(self.test);
 }
 

@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-
+#include <stdbool.h>
 
 // You must free the result if result is non-NULL.
 char *strrep(char *orig, char *rep, char *with) {
@@ -52,14 +52,23 @@ char *strrep(char *orig, char *rep, char *with) {
     return result;
 }
 
-// Replaces all instances of rcep with with
+// Replaces all instances of rep with with
 char *strrepall(char *orig, char *rep, char *with) {
     char *new = "";
     char *result = orig;
+    bool new_is_stack = true;
     while (strcmp(new, result) != 0) {
+	if (!new_is_stack && new != orig)
+		free(new); // keeps strrep from leaking memory
+	new_is_stack = false;
         new = result;
         result = strrep(result, rep, with);
     }
-    return strdup(result);
+    char *heapresult = strdup(result);
+    if (!new_is_stack && new != orig)
+	    free(new);
+    if (result != orig)
+	    free(result);
+    return heapresult;
 }
 

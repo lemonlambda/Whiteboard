@@ -53,6 +53,7 @@ void free_args(args_t args) {
 
 bool run(const char *arg, args_t *args) {
     if (strcmp(arg, "--") != 0) {
+	free((void*)args->build_name);
         args->build_name = strdup(arg);
         return false;
     }

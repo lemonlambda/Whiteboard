@@ -78,6 +78,9 @@ args_t parse_args(int argc, const char **argv) {
         }
         
         if ((args.run_func || build_mode) && !got_two_dashes) {
+            // I don't know if I should be putting this here but I am so let's see if it fucks up
+            // later down the line
+            args.default_build = false;
             got_two_dashes = run(arg, &args);
         } else if (got_two_dashes) {
             char formatted[strlen(arg) + 5];

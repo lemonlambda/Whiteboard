@@ -34,6 +34,7 @@ void run_stages(stage_t *self, package_t *project, bin_t *bin) {
         char *replaced = replace_args(cmd, project, bin);
         printf("%sStage %s%s%s:%s %s\n", BHMAG, BHGRN, cmd->name, BHMAG, CRESET, replaced);
         int error = system(replaced);
+	free(replaced);
         if (error != 0)
             errx(error, "Recieved error in command, exiting.");
     }

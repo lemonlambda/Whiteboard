@@ -5,6 +5,10 @@ version = "0.0.1.0"
 [[bin]]
 default = true
 name = "NewRelease"
+cc = "gcc"
+ld = "gcc"
+ccargs = "-O2 -Wall -Wextra"
+ldargs = "-B gcc"
 includedir = "src"
 
 [[bin]]

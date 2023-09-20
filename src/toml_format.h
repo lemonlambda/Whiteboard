@@ -26,6 +26,10 @@ typedef struct bin {
     char *includedir;
     char *targetdir;
     char *programincludedir;
+    char *cc;
+    char *ld;
+    char *ccargs;
+    char *ldargs;
 
     struct {
         #ifdef DEBUG

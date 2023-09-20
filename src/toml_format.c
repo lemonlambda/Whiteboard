@@ -45,6 +45,10 @@ bin_t init_bin() {
     bin.default_bin = false;
     bin.name = NULL;
     bin.srcdir = "src";
+    bin.cc = "gcc";
+    bin.ld = "gcc";
+    bin.ccargs = "-O2 -Wall -Wextra"; // defaults as per issue/PR #8
+    bin.ldargs = "-B gcc";
     #ifdef WIN32
         bin.includedir = "src\\include";
         bin.targetdir = "target";
@@ -105,6 +109,20 @@ void make_bin(config_t *self, toml_table_t *toml, char *bin_name) {
             default_defined_already = true;
         else if (bin->default_bin && default_defined_already)
             errx(1, "Default bin already defined in bin: `%s`", name.u.s);
+
+	// Compiler & Linker
+	toml_datum_t cc = toml_string_in(table, "cc");
+	if (cc.ok)
+		bin->cc = cc.u.s;
+	toml_datum_t ld = toml_string_in(table, "ld");
+	if (ld.ok)
+		bin->ld = ld.u.s;
+	toml_datum_t ccargs = toml_string_in(table, "ccargs");
+	if (ccargs.ok)
+		bin->ccargs = ccargs.u.s;
+	toml_datum_t ldargs = toml_string_in(table, "ldargs");
+	if (ldargs.ok)
+		bin->ldargs = ldargs.u.s;
 
         bin->name = name.u.s;
         #ifdef DEBUG

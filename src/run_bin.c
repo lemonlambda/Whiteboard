@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <err.h>
 
+#include "debug.h"
 #include "args_parser.h"
 #include "toml_format.h"
 #include "run_bin.h"
@@ -19,6 +20,9 @@ void build_bin(package_t *package, bin_t *bin, args_t *args) {
         stage.callbacks.run_stages(&stage, package, bin);
     } else if (args->clean_mode) {
         stage_t stage = clean_stage();
+        stage.callbacks.run_stages(&stage, package, bin);
+    } else if (args->test_mode) {
+        stage_t stage = test_stage();
         stage.callbacks.run_stages(&stage, package, bin);
     } else {
         errx(1, "No valid modes inputted into `build_bin`");
@@ -44,8 +48,21 @@ void run_whiteboard(args_t *args) {
 
     config_t config = init_config();
     config.callbacks.make_config(&config, conf);
+
+    #ifdef DEBUG
+        printf("\n%d\n\n", args->test_mode);
+    #endif
+    
     for (int i = 0; ; i++) {
-        bin_t *value = (bin_t *)config.bin.callbacks.get(&config.bin, i);
+        bin_t *value;
+        if (args->test_mode)
+            value = (bin_t *)config.test.callbacks.get(&config.test, i);
+        else
+            value = (bin_t *)config.bin.callbacks.get(&config.bin, i);
+
+        #ifdef DEBUG
+            value->callbacks.print_bin(value);
+        #endif
 
         if (value == NULL && !value->default_bin) {
             errx(1, "Can't find a build by that name\n");

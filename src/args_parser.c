@@ -7,18 +7,22 @@
 #include "rust_types.h"
 #include "args_parser.h"
 
+#define maybe_free(ptr) if (ptr != NULL) free((void *)ptr); ptr = NULL
 
 args_t init_args() {
     args_t args;
+    
     args.run_mode = false;
     args.build_mode = false;
     args.clean_mode = false;
+    args.test_mode = false;
+    
     args.default_build = true;
     args.quiet_mode = false;
     args.run_func = false;
     args.clean_mode = false;
-    args.build_name = calloc(0, sizeof(const char *));
-    args.run_args = calloc(0, sizeof(char *));
+    args.build_name = calloc(1, sizeof(const char *));
+    args.run_args = calloc(1, sizeof(char *));
     return args;
 }
 
@@ -43,13 +47,13 @@ char *to_string(args_t *args) {
 }
 
 void free_args(args_t args) {
-    free((void *)args.build_name);
-    free((void *)args.run_args);
+    maybe_free(args.build_name);
+    maybe_free(args.run_args);
 }
 
 bool run(const char *arg, args_t *args) {
     if (strcmp(arg, "--") != 0) {
-        args->build_name = arg;
+        args->build_name = strdup(arg);
         return false;
     }
     return true;
@@ -79,7 +83,7 @@ args_t parse_args(int argc, const char **argv) {
             char formatted[strlen(arg) + 5];
             sprintf(formatted, "%s ", arg);
             args.run_args = realloc(args.run_args, sizeof(char) * (strlen(args.run_args) + strlen(formatted) + 1));
-	        assert (args.run_args != NULL);
+	        assert(args.run_args != NULL);
             strcat(args.run_args, formatted);
         } else {
             if (strcmp(arg, "run") == 0) {
@@ -93,6 +97,12 @@ args_t parse_args(int argc, const char **argv) {
             if (strcmp(arg, "clean") == 0) {
                 args.clean_mode = true;
                 args.run_func = true;
+            }
+            if (strcmp(arg, "test") == 0) {
+                args.test_mode = true;
+                args.run_func = true;
+                if (argc < 3)
+                    errx(1, "You must provide the name of the test that you want to test");
             }
         }
     }

@@ -1,9 +1,14 @@
 #include "toml_format.h"
 #include "vector.h"
+#include "platform_specific.h"
+#include "debug.h"
 
 #include <err.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <string.h>
+
+#define streq(str1, str2) strcmp(str1, str2) == 0
 
 // Inits a blank package
 package_t init_package() {
@@ -29,21 +34,41 @@ void make_package(package_t *self, toml_table_t *toml) {
     self->version = version.u.s;
 }
 
+#ifdef DEBUG
+void print_bin(bin_t *self) {
+    printf("struct bin {\n\tdefault_bin: %d\n\tname: %s\n\tsrcdir: %s\n\tincludedir: %s\n\ttargetdir: %s\n\tprogramincludedir: %s\n}\n", self->default_bin, self->name, self->srcdir, self->includedir, self->targetdir, self->programincludedir);
+}
+#endif
+
 bin_t init_bin() {
     bin_t bin;
     bin.default_bin = false;
     bin.name = NULL;
     bin.srcdir = "src";
-    bin.includedir = "src/include";
-    bin.targetdir = "target";
+    #ifdef WIN32
+        bin.includedir = "src\\include";
+        bin.targetdir = "target";
+        // Used for tests
+        bin.programincludedir = "src\\include";
+    #else
+        bin.includedir = "src/include";
+        bin.targetdir = "target";
+        // Used for tests
+        bin.programincludedir = "src/include";
+    #endif
+    #ifdef DEBUG
+        bin.callbacks.print_bin = &print_bin;
+    #endif
     return bin;
 }
 
-void make_bin(config_t *self, toml_table_t *toml) {
-    toml_array_t *array = toml_array_in(toml, "bin");
-    if (!array) {
+void make_bin(config_t *self, toml_table_t *toml, char *bin_name) {
+    #ifdef DEBUG
+        printf("BIN Name: %s\n", bin_name);
+    #endif
+    toml_array_t *array = toml_array_in(toml, strdup(bin_name));
+    if (!array)
         errx(1, "Bins doesn't exist in whiteboard.toml");
-    }
     bool default_defined_already = false;
 
     for (int i = 0; ; i++) {
@@ -71,6 +96,9 @@ void make_bin(config_t *self, toml_table_t *toml) {
         toml_datum_t targetdir = toml_string_in(table, "targetdir");
         if (targetdir.ok)
             bin->targetdir = targetdir.u.s;
+        toml_datum_t programincludedir = toml_string_in(table, "programincludedir");
+        if (targetdir.ok)
+            bin->programincludedir = programincludedir.u.s;
 
         if (bin->default_bin && !default_defined_already)
             default_defined_already = true;
@@ -78,13 +106,22 @@ void make_bin(config_t *self, toml_table_t *toml) {
             errx(1, "Default bin already defined in bin: `%s`", name.u.s);
 
         bin->name = name.u.s;
-        self->bin.callbacks.push(&self->bin, bin);
+        #if DEBUG
+            bin->callbacks.print_bin(bin);
+        #endif
+        if (streq(bin_name, "bin"))
+            self->bin.callbacks.push(&self->bin, bin);
+        else if (streq(bin_name, "test"))
+            self->test.callbacks.push(&self->test, bin);
+        else
+            errx(1, "Not a valid name for make_bin");
     }
 }
 
 void make_config(config_t *self, toml_table_t *toml) {
     self->package.callbacks.make_package(&self->package, toml);
-    self->callbacks.make_bin(self, toml);
+    self->callbacks.make_bin(self, toml, "bin");
+    self->callbacks.make_bin(self, toml, "test");
 }
 
 // Inits a blank config
@@ -92,13 +129,13 @@ config_t init_config() {
     config_t config;
     config.package = init_package();
     config.bin = init_vector();
+    config.test = init_vector();
     config.callbacks.make_bin = &make_bin;
     config.callbacks.make_config = &make_config;
     return config;
 }
 
-void free_config(config_t const self)
-{
+void free_config(config_t const self) {
 	free(self.package.name);
 	free(self.package.version);
 	for (size_t i = 0; i < self.bin.len; ++i) {
@@ -109,3 +146,4 @@ void free_config(config_t const self)
 	}
 	free_vector(self.bin);
 }
+

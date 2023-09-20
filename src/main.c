@@ -15,6 +15,9 @@
 int main(int argc, const char **argv) {
     assert(argv != NULL);
 
+    if (argc == 1)
+        errx(1, "You need to provide a sub-command of: `run`, `build` or `clean`");
+
     args_t args = parse_args(argc, argv);
 
     #ifdef DEBUG

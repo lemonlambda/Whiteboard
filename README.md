@@ -1,5 +1,5 @@
 # Whiteboard is a simple buildtool for C
-Whiteboard is a spmile buildtool for C.
+Whiteboard is a simple buildtool for C.
 
 # Compiling
 You can run these commands with gcc to compile (on linux) or figure it out on your own.

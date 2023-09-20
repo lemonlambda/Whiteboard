@@ -9,6 +9,7 @@
 #include <string.h>
 #include <assert.h>
 #include <dirent.h>
+#include <err.h>
 
 #define streq(str1, str2) strcmp(str1, str2) == 0
 
@@ -32,7 +33,9 @@ void run_stages(stage_t *self, package_t *project, bin_t *bin) {
 
         char *replaced = replace_args(cmd, project, bin);
         printf("%sStage %s%s%s:%s %s\n", BHMAG, BHGRN, cmd->name, BHMAG, CRESET, replaced);
-        system(replaced);
+        int error = system(replaced);
+        if (error != 0)
+            errx(error, "Recieved error in command, exiting.");
     }
 }
 
@@ -54,7 +57,6 @@ void free_stage(stage_t self) {
 
 // Default stages
 stage_t build_stage(char *def) {
-    fflush(stdout);
     stage_t stage;
     if (def == NULL) {
         stage = init_stage("Build");
@@ -65,13 +67,11 @@ stage_t build_stage(char *def) {
 
     // Very fun and not annoying platform specific build instructions
     #ifdef WIN32
-        fflush(stdout);
         stage.callbacks.add_stage(&stage, new_command("Make Dirs", "mkdir {targetdir} && mkdir {targetdir}\\{projectname} && mkdir {targetdir}\\{projectname}\\obj && mkdir {targetdir}\\{projectname}\\bin"));
         stage.callbacks.add_stage(&stage, new_command("Compilation", "gcc -O2 -Wall -Wextra -c {srcfiles} -I {includedir}"));
         stage.callbacks.add_stage(&stage, new_command("Moving Objects", "mv *.o {targetdir}\\{projectname}\\obj"));
         stage.callbacks.add_stage(&stage, new_command("Linking", "gcc -B gcc {targetdir}\\{projectname}\\obj\\* -o {targetdir}\\{projectname}\\bin\\{binname}-{projectversion}"));
     #else
-        fflush(stdout);
         stage.callbacks.add_stage(&stage, new_command("Make Dirs", "mkdir -p {targetdir}/{projectname} && mkdir -p {targetdir}/{projectname}/obj {targetdir}/{projectname}/bin"));
         stage.callbacks.add_stage(&stage, new_command("Compilation", "gcc -O2 -Wall -Wextra -c {srcfiles} -I {includedir}"));
         stage.callbacks.add_stage(&stage, new_command("Moving Objects", "mv *.o {targetdir}/{projectname}/obj"));
@@ -84,9 +84,7 @@ stage_t build_stage(char *def) {
 }
 
 stage_t run_stage() {
-    fflush(stdout);
     stage_t stage = build_stage("Run");
-    fflush(stdout);
     
     #ifdef WIN32
         stage.callbacks.add_stage(&stage, new_command("Run", ".\\{targetdir}\\{projectname}\\bin\\{binname}-{projectversion}"));
@@ -106,6 +104,26 @@ stage_t clean_stage() {
         stage.callbacks.add_stage(&stage, new_command("Remove Target", "rm -rf ./{targetdir}"));
     #endif
     
+    return stage;
+}
+
+stage_t test_stage() {
+    stage_t stage = init_stage("Run");
+
+    #ifdef WIN32
+        stage.callbacks.add_stage(&stage, new_command("Make Dirs", "mkdir {targetdir} && mkdir {targetdir}\\{projectname} && mkdir {targetdir}\\{projectname}\\obj && mkdir {targetdir}\\{projectname}\\bin"));
+        stage.callbacks.add_stage(&stage, new_command("Compilation", "gcc -O2 -Wall -Wextra -c {srcfiles} -I {includedir} -I {programincludedir}"));
+        stage.callbacks.add_stage(&stage, new_command("Moving Objects", "mv *.o {targetdir}\\{projectname}\\obj"));
+        stage.callbacks.add_stage(&stage, new_command("Linking", "gcc -B gcc {targetdir}\\{projectname}\\obj\\* -o {targetdir}\\{projectname}\\bin\\{binname}"));
+        stage.callbacks.add_stage(&stage, new_command("Test", ".\\{targetdir}\\{projectname}\\bin\\{binname}"));
+    #else
+        stage.callbacks.add_stage(&stage, new_command("Make Dirs", "mkdir -p {targetdir}/{projectname} && mkdir -p {targetdir}/{projectname}/obj {targetdir}/{projectname}/bin"));
+        stage.callbacks.add_stage(&stage, new_command("Compilation", "gcc -O2 -Wall -Wextra -c {srcfiles} -I {includedir} -I {programincludedir}"));
+        stage.callbacks.add_stage(&stage, new_command("Moving Objects", "mv *.o {targetdir}/{projectname}/obj"));
+        stage.callbacks.add_stage(&stage, new_command("Linking", "gcc -B gcc {targetdir}/{projectname}/obj/* -o {targetdir}/{projectname}/bin/{binname}"));
+        stage.callbacks.add_stage(&stage, new_command("Test", "./{targetdir}/{projectname}/bin/{binname}"));
+    #endif
+
     return stage;
 }
 
@@ -142,6 +160,7 @@ char *replace_args(command_t *cmd, package_t *project, bin_t *bin) {
     format = strrepall(format, "{binname}", bin->name);
     format = strrepall(format, "{srcdir}", bin->srcdir);
     format = strrepall(format, "{includedir}", bin->includedir);
+    format = strrepall(format, "{programincludedir}", bin->programincludedir);
     format = strrepall(format, "{projectname}", project->name);
     format = strrepall(format, "{projectversion}", project->version);
 
@@ -155,7 +174,7 @@ char *replace_args(command_t *cmd, package_t *project, bin_t *bin) {
 
 // Should free the result after done using
 char *get_source_files(bin_t *bin) {
-    usize current_size = 512;
+    usize current_size = 64;
     char *src_dir = calloc(1, sizeof(char) * current_size);
     DIR *dir;
     bool first_run = true;
@@ -163,6 +182,9 @@ char *get_source_files(bin_t *bin) {
     dir = opendir(bin->srcdir);
     assert(dir != NULL);
     while ((en = readdir(dir)) != NULL) {
+        #ifdef EXPLICIT_DEBUG
+            printf("File: %s\n", en->d_name);
+        #endif
         // Reallocate the string if it needs to be bigger
         while (strlen(en->d_name) + strlen(src_dir) + 1 > current_size) {
             current_size *= 2;
@@ -194,6 +216,9 @@ char *get_source_files(bin_t *bin) {
         #endif
         first_run = false;
     }
+    #ifdef DEBUG
+        printf("SRC_FILES: %s\n", src_dir);
+    #endif
     return src_dir;
 }
 
@@ -205,6 +230,7 @@ usize find_size(char *cmd, package_t *project, bin_t *bin) {
     usize count_binname = count_string(cmd, "{binname}");
     usize count_srcdir = count_string(cmd, "{srcdir}");
     usize count_includedir = count_string(cmd, "{includedir}");
+    usize count_programincludedir = count_string(cmd, "{programincludedir}");
     usize count_projectname = count_string(cmd, "{projectversion}");
     usize count_projectversion = count_string(cmd, "{projectname}");
 
@@ -214,6 +240,7 @@ usize find_size(char *cmd, package_t *project, bin_t *bin) {
     length += count_binname * strlen(bin->name);
     length += count_srcdir * strlen(bin->srcdir);
     length += count_includedir * strlen(bin->includedir);
+    length += count_programincludedir * strlen(bin->programincludedir);
     length += count_projectname * strlen(project->name);
     length += count_projectversion * strlen(project->version);
 

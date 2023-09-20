@@ -38,7 +38,6 @@ void increase_size(vector_t *self) {
     assert (self->contents != NULL);
 }
 
-void free_vector(vector_t const self)
-{
+void free_vector(vector_t const self) {
 	free(self.contents);
 }

@@ -15,6 +15,13 @@
 int main(int argc, const char **argv) {
     assert(argv != NULL);
 
+    #ifdef DEBUG
+        printf("ArgC: %d\n", argc);
+    #endif
+
+    if (argc == 1)
+        errx(1, "Invalid amount of args. You need to provide a sub-command of: `run`, `build`, `test`, or `clean`");
+
     args_t args = parse_args(argc, argv);
 
     #ifdef DEBUG
@@ -24,7 +31,7 @@ int main(int argc, const char **argv) {
     #endif
     
     if (!args.run_func)
-        errx(1, "You need to provide a sub-command of: `run`, `build` or `clean`");
+        errx(1, "You need to provide a sub-command of: `run`, `build`, `test`, or `clean`");
 
     assert(args.run_args != NULL);
     assert(args.build_name != NULL);

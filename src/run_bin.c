@@ -12,21 +12,24 @@
 #include "stages.h"
 
 void build_bin(package_t *package, bin_t *bin, args_t *args) {
+    stage_t stage;
     if (args->build_mode) {
-        stage_t stage = build_stage(NULL);
+        stage = build_stage(NULL);
         stage.callbacks.run_stages(&stage, package, bin);
     } else if (args->run_mode) {
-        stage_t stage = run_stage();
+        stage = run_stage();
         stage.callbacks.run_stages(&stage, package, bin);
     } else if (args->clean_mode) {
-        stage_t stage = clean_stage();
+        stage = clean_stage();
         stage.callbacks.run_stages(&stage, package, bin);
     } else if (args->test_mode) {
-        stage_t stage = test_stage();
+        stage = test_stage();
         stage.callbacks.run_stages(&stage, package, bin);
     } else {
         errx(1, "No valid modes inputted into `build_bin`");
+	return; // skip past free_stage or this is UB
     }
+    free_stage(stage);
 }
 
 void run_whiteboard(args_t *args) {
@@ -86,7 +89,7 @@ void run_whiteboard(args_t *args) {
             break;
         }
     }
-    
+
     toml_free(conf);
     free_config(config);
 }

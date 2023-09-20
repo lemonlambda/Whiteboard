@@ -70,7 +70,7 @@ void make_bin(config_t *self, toml_table_t *toml, char *bin_name) {
     #ifdef DEBUG
         printf("BIN Name: %s\n", bin_name);
     #endif
-    toml_array_t *array = toml_array_in(toml, strdup(bin_name));
+    toml_array_t *array = toml_array_in(toml, bin_name);
     // Early return because said thing doesn't exist in the toml
     if (!array)
         return;

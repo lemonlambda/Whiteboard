@@ -53,6 +53,12 @@ stage_t init_stage(char *name) {
 
 void free_stage(stage_t self) {
     free(self.stage_name);
+    for (usize i = 0; i < self.commands.len; ++i) {
+	    command_t *pcmd = self.commands.contents[i];
+	    free(pcmd->name);
+	    free(pcmd->command);
+            free(pcmd);
+    }
     free_vector(self.commands);
 }
 

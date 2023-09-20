@@ -67,8 +67,9 @@ void make_bin(config_t *self, toml_table_t *toml, char *bin_name) {
         printf("BIN Name: %s\n", bin_name);
     #endif
     toml_array_t *array = toml_array_in(toml, strdup(bin_name));
+    // Early return because said thing doesn't exist in the toml
     if (!array)
-        errx(1, "%s doesn't exist in whiteboard.toml", bin_name);
+        return;
     bool default_defined_already = false;
 
     for (int i = 0; ; i++) {
@@ -81,7 +82,7 @@ void make_bin(config_t *self, toml_table_t *toml, char *bin_name) {
 
         toml_datum_t name = toml_string_in(table, "name");
         if (!name.ok)
-            errx(1, "There is no name for the bin");
+            errx(1, "There is no name for the %s", bin_name);
         toml_datum_t default_bin = toml_bool_in(table, "default");
         if (default_bin.ok)
             bin->default_bin = (bool)default_bin.u.b;
@@ -120,8 +121,8 @@ void make_bin(config_t *self, toml_table_t *toml, char *bin_name) {
 
 void make_config(config_t *self, toml_table_t *toml) {
     self->package.callbacks.make_package(&self->package, toml);
-    self->callbacks.make_bin(self, toml, "bin");
     self->callbacks.make_bin(self, toml, "test");
+    self->callbacks.make_bin(self, toml, "bin");
 }
 
 // Inits a blank config
@@ -138,12 +139,7 @@ config_t init_config() {
 void free_config(config_t const self) {
 	free(self.package.name);
 	free(self.package.version);
-	for (size_t i = 0; i < self.bin.len; ++i) {
-		bin_t *bin = self.bin.contents[i];
-		free(bin->name);
-		free(bin->includedir);
-		free(bin);
-	}
 	free_vector(self.bin);
+	free_vector(self.test);
 }
 

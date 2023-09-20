@@ -9,6 +9,7 @@
 #include <string.h>
 #include <assert.h>
 #include <dirent.h>
+#include <err.h>
 
 #define streq(str1, str2) strcmp(str1, str2) == 0
 
@@ -32,7 +33,9 @@ void run_stages(stage_t *self, package_t *project, bin_t *bin) {
 
         char *replaced = replace_args(cmd, project, bin);
         printf("%sStage %s%s%s:%s %s\n", BHMAG, BHGRN, cmd->name, BHMAG, CRESET, replaced);
-        system(replaced);
+        int error = system(replaced);
+        if (error != 0)
+            errx(error, "Recieved error in command, exiting.");
     }
 }
 
@@ -171,7 +174,7 @@ char *replace_args(command_t *cmd, package_t *project, bin_t *bin) {
 
 // Should free the result after done using
 char *get_source_files(bin_t *bin) {
-    usize current_size = 512;
+    usize current_size = 64;
     char *src_dir = calloc(1, sizeof(char) * current_size);
     DIR *dir;
     bool first_run = true;
@@ -179,6 +182,9 @@ char *get_source_files(bin_t *bin) {
     dir = opendir(bin->srcdir);
     assert(dir != NULL);
     while ((en = readdir(dir)) != NULL) {
+        #ifdef EXPLICIT_DEBUG
+            printf("File: %s\n", en->d_name);
+        #endif
         // Reallocate the string if it needs to be bigger
         while (strlen(en->d_name) + strlen(src_dir) + 1 > current_size) {
             current_size *= 2;
@@ -210,6 +216,9 @@ char *get_source_files(bin_t *bin) {
         #endif
         first_run = false;
     }
+    #ifdef DEBUG
+        printf("SRC_FILES: %s\n", src_dir);
+    #endif
     return src_dir;
 }
 

@@ -52,6 +52,15 @@ void run_whiteboard(args_t *args) {
     #ifdef DEBUG
         printf("\n%d\n\n", args->test_mode);
     #endif
+
+    if (args->test_mode) {
+        if (config.test.len == 0)
+            errx(1, "There are no tests in the toml\n");
+    } else {
+        if (config.bin.len == 0)
+            errx(1, "There are no bins in the toml\n");
+    }
+        
     
     for (int i = 0; ; i++) {
         bin_t *value;

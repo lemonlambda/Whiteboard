@@ -7,6 +7,13 @@
 #include "vector.h"
 #include "toml.h"
 
+// @desc		Whiteboard package info struct
+//
+// @field(name)		Name of package
+// @field(version)	Version of package
+//
+// @field(callbacks)	Container of all callback functions
+// @field(callbacks.make_package)	Makes a package struct given the toml
 typedef struct package {
     char *name;
     char *version;
@@ -16,8 +23,13 @@ typedef struct package {
     } callbacks;
 } package_t;
 
-void make_package(package_t *self, toml_table_t *toml);
+// @desc	Create a new package
+// @returns	Default package object
 package_t init_package();
+// @desc	Makes a package struct given the toml
+// @arg(self)	`package_t` to fill out
+// @arg(toml)	Whiteboard file toml
+void make_package(package_t *self, toml_table_t *toml);
 
 typedef struct bin {
     bool default_bin;

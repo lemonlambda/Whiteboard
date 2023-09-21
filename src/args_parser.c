@@ -30,9 +30,9 @@ const char *null_str(const char *value) {
     return (value ? (strcmp(value, "") == 0 ? "EMPTY_STRING" : value): "NULL");
 }
 
-char *to_string(args_t *args) {
-    const char *null_build_name = null_str(args->build_name);
-    const char *null_run_args = null_str(args->run_args);
+char *to_string(args_t args) {
+    const char *null_build_name = null_str(args.build_name);
+    const char *null_run_args = null_str(args.run_args);
 
     char *format = "\
 struct args \n\
@@ -51,7 +51,7 @@ struct args \n\
     sprintf(
         displayed, 
         format,
-        null_build_name, null_run_args, args->run_mode, args->build_mode, args->clean_mode, args->test_mode, args->default_build, args->quiet_mode, args->run_func
+        null_build_name, null_run_args, args.run_mode, args.build_mode, args.clean_mode, args.test_mode, args.default_build, args.quiet_mode, args.run_func
     );
     char *final = malloc(sizeof(char) * (strlen(displayed) + 1));
     strcpy(final, displayed);

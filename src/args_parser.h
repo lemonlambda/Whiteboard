@@ -20,7 +20,7 @@ const char *null_str(const char *value);
 
 args_t init_args();
 void free_args(args_t args);
-char *to_string(args_t *args);
+char *to_string(args_t args);
 
 bool run(const char *arg, args_t *args);
 args_t parse_args(int argc, const char **argv);

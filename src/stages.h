@@ -80,6 +80,7 @@ char *get_source_files(bin_t* bin);
 // @arg(package)	Package/project config
 // @arg(bin)		Binary config
 // @returns		Command with substitution strings filled in
+// @note		Return value must be freed
 char *replace_args(command_t *cmd, package_t *package, bin_t *bin);
 // @desc		Finds the size (not length) of `cmd` post-substitution, without doing any substituting.
 // @arg(cmd)		Command to search for substitution strings in

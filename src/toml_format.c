@@ -1,4 +1,5 @@
 #include "toml_format.h"
+#include "toml.h"
 #include "vector.h"
 #include "platform_specific.h"
 #include "debug.h"
@@ -44,7 +45,7 @@ bin_t init_bin() {
     bin_t bin;
     bin.default_bin = false;
     bin.name = NULL;
-    bin.srcdir = strdup("src");
+    bin.srcdir = (sources_t) {.is_array = false, .single = strdup("src")};
     bin.cc = strdup("gcc");
     bin.ld = strdup("gcc");
     bin.ccargs = strdup("-O2 -Wall -Wextra"); // defaults as per issue/PR #8
@@ -94,8 +95,24 @@ void make_bin(config_t *self, toml_table_t *toml, char *bin_name) {
         // Dirs
         toml_datum_t srcdir = toml_string_in(table, "srcdir");
         if (srcdir.ok) {
-	    free(bin->srcdir);
-            bin->srcdir = srcdir.u.s;
+	    free(bin->srcdir.single);
+	    bin->srcdir.is_array = false;
+            bin->srcdir.single = srcdir.u.s;
+	} else {
+            toml_array_t *arrsrcdir = toml_array_in(table, "srcdir");
+	    if (arrsrcdir != NULL) {
+		int num_elems = toml_array_nelem(arrsrcdir);
+                free(bin->srcdir.single);
+		bin->srcdir.is_array = true;
+		bin->srcdir.multi = init_vector();
+		for (int i = 0; i < num_elems; ++i) {
+			toml_datum_t next_src_dir = toml_string_at(arrsrcdir, i);
+			if (!next_src_dir.ok) {
+				errx(1, "Invalid src dir for %s", bin_name);
+			}
+			bin->srcdir.multi.callbacks.push(&bin->srcdir.multi, next_src_dir.u.s);
+		}
+	    }
 	}
         toml_datum_t includedir = toml_string_in(table, "includedir");
         if (includedir.ok) {
@@ -178,7 +195,13 @@ void free_bin(bin_t const self)
 	free(self.ld);
 	free(self.ccargs);
 	free(self.ldargs);
-	free(self.srcdir);
+	if (self.srcdir.is_array) {
+		for (usize i = 0; i < self.srcdir.multi.len; ++i)
+			free(self.srcdir.multi.contents[i]);
+		free_vector(self.srcdir.multi);
+	} else {
+		free(self.srcdir.single);
+	}
 	free(self.includedir);
 	free(self.targetdir);
 	free(self.programincludedir);

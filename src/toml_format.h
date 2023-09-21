@@ -31,10 +31,19 @@ package_t init_package();
 // @arg(toml)	Whiteboard file toml
 void make_package(package_t *self, toml_table_t *toml);
 
+typedef struct sources {
+	bool is_array;
+	union {
+		char *single;
+		// vector_t of char* source dirs
+		vector_t multi;
+	};
+} sources_t;
+
 // @desc			Parsed format for entries in a whiteboard file
 // @field(default_bin)		Is this the default binary option?
 // @field(name)			Name of this configuration
-// @field(srcdir)		C source directory
+// @field(srcdir)		C source directory/directories (see `sources_t`)
 // @field(includedir)		C includes directory
 // @field(targetdir)		C target directory
 // @field(programincludedir)	Used for test bins to add include paths for their builds
@@ -47,7 +56,7 @@ void make_package(package_t *self, toml_table_t *toml);
 typedef struct bin {
     bool default_bin;
     char *name;
-    char *srcdir;
+    sources_t srcdir;
     char *includedir;
     char *targetdir;
     char *programincludedir;

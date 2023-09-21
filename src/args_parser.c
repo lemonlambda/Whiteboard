@@ -63,7 +63,7 @@ void free_args(args_t args) {
     maybe_free(args.run_args);
 }
 
-bool run(const char *arg, args_t *args) {
+bool check_default_build(const char *arg, args_t *args) {
     if (strcmp(arg, "--") != 0) {
 	free((void*)args->build_name);
         args->build_name = strdup(arg);
@@ -94,7 +94,7 @@ args_t parse_args(int argc, const char **argv) {
             // I don't know if I should be putting this here but I am so let's see if it fucks up
             // later down the line
             args.default_build = false;
-            got_two_dashes = run(arg, &args);
+            got_two_dashes = check_default_build(arg, &args);
         } else if (got_two_dashes) {
             char formatted[strlen(arg) + 5];
             sprintf(formatted, "%s ", arg);

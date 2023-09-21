@@ -19,10 +19,19 @@ typedef struct package {
 void make_package(package_t *self, toml_table_t *toml);
 package_t init_package();
 
+typedef struct sources {
+	bool is_array;
+	union {
+		char *single;
+		// vector_t of char* source dirs
+		vector_t multi;
+	};
+} sources_t;
+
 typedef struct bin {
     bool default_bin;
     char *name;
-    char *srcdir;
+    sources_t srcdir;
     char *includedir;
     char *targetdir;
     char *programincludedir;

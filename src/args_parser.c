@@ -34,7 +34,19 @@ char *to_string(args_t *args) {
     const char *null_build_name = null_str(args->build_name);
     const char *null_run_args = null_str(args->run_args);
 
-    char *format = "struct args \n{\n\tbuild_name: %s\n\trun_args: %s\n\trun_mode: %i\n\tbuild_mode: %i\n\tclean_mode: %i\n\ttest_mode: %i\n\tdefault_build: %i\n\tquiet_mode: %i\n\trun_func: %i\n}";
+    char *format = "\
+struct args \n\
+{\n\
+	build_name: %s\n\
+	run_args: %s\n\
+	run_mode: %i\n\
+	build_mode: %i\n\
+	clean_mode: %i\n\
+	test_mode: %i\n\
+	default_build: %i\n\
+	quiet_mode: %i\n\
+	run_func: %i\n\
+}";
     char displayed[strlen(format) + strlen(null_build_name) + strlen(null_run_args) + 1 + 1 + 1 + 1 + 1];
     sprintf(
         displayed, 

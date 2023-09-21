@@ -34,12 +34,12 @@ typedef struct stage {
 } stage_t;
 
 
+stage_t init_stage(char *name);
 stage_t run_stage();
 stage_t build_stage(char *def);
 stage_t clean_stage();
 stage_t test_stage();
 
-stage_t init_stage(char *name);
 void add_stage(stage_t *self, command_t cmd);
 void run_stages(stage_t *self, package_t *project, bin_t *bin);
 
@@ -49,4 +49,4 @@ void free_stage(stage_t self);
 char *get_source_files(bin_t* bin);
 char *replace_args(command_t *cmd, package_t *package, bin_t *bin);
 usize find_size(char *cmd, package_t *project, bin_t *bin);
-usize count_string(const char *str1, const char *str2);
+usize count_string(const char *haystack, const char *needle);

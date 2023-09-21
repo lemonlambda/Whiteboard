@@ -174,7 +174,18 @@ char *replace_args(command_t *cmd, package_t *project, bin_t *bin) {
 
     UNHAPPY_REP(targetdir, bin->targetdir);
     UNHAPPY_REP(binname, bin->name);
-    UNHAPPY_REP(srcdir, bin->srcdir);
+    if (bin->srcdir.is_array) {
+        usize len = 2; // one for initial space, one for null term
+        for (usize i = 0; i < bin->srcdir.multi.len; ++i)
+            len += strlen((char*)bin->srcdir.multi.contents[i]) + 1; // +1 for space inbetween
+        char *src_dir = malloc(len);
+	usize pos = 0;
+        for (usize i = 0; i < bin->srcdir.multi.len; ++i)
+	    pos += sprintf(&src_dir[pos], " %s", (char*)bin->srcdir.multi.contents[i]);
+	UNHAPPY_REP(srcdir, src_dir);
+    } else {
+	UNHAPPY_REP(srcdir, bin->srcdir.single);
+    }
     UNHAPPY_REP(includedir, bin->includedir);
     UNHAPPY_REP(programincludedir, bin->programincludedir);
     UNHAPPY_REP(cc, bin->cc);
@@ -288,7 +299,13 @@ usize find_size(char *cmd, package_t *project, bin_t *bin) {
 
     length += count_targetdir * strlen(bin->targetdir);
     length += count_binname * strlen(bin->name);
-    length += count_srcdir * strlen(bin->srcdir);
+    if (bin->srcdir.is_array) {
+        for (usize i = 0; i < bin->srcdir.multi.len; ++i) {
+            length += count_srcdir * strlen((char*)bin->srcdir.multi.contents[i]) + 1; // +1 for space inbetween
+	}
+    } else {
+        length += count_srcdir * strlen(bin->srcdir.single);
+    }
     length += count_includedir * strlen(bin->includedir);
     length += count_programincludedir * strlen(bin->programincludedir);
     length += count_cc * strlen(bin->cc);

@@ -13,8 +13,6 @@
 
 #define streq(str1, str2) strcmp(str1, str2) == 0
 
-char *replace_args(command_t *cmd, package_t *project, bin_t *bin);
-
 void add_stage(stage_t *self, command_t cmd) {
     command_t *malloced = malloc(sizeof(command_t));
     assert(malloced != NULL);
@@ -276,13 +274,13 @@ usize find_size(char *cmd, package_t *project, bin_t *bin) {
 }
 
 // Finds the amount of substrings
-usize count_string(const char *str1, const char *str2) {
-    assert(str1 != NULL);
-    assert(str2 != NULL);
+usize count_string(const char *haystack, const char *needle) {
+    assert(haystack != NULL);
+    assert(needle != NULL);
     
     usize count = 0;
-    const char *tmp = str1;
-    while ((tmp = strstr(tmp, str2))) {
+    const char *tmp = haystack;
+    while ((tmp = strstr(tmp, needle))) {
         count++;
         tmp++;
     }

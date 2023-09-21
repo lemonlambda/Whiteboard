@@ -2,6 +2,19 @@
 
 #include <stdbool.h>
 
+// @desc			Parsed command-line arguments
+//
+// @field(build_name)		Which build to run
+// @field(run_args)		Command line options (--args)
+// @field(default_build)	If the command will use the default build
+//
+// @field(run_mode)		If the command will run
+// @field(build_mode)		If the command will build
+// @field(clean_mode)		If the command will clean
+// @field(quiet_mode)		If the command is set to be quiet
+// @field(test_mode)		If the command will run a test
+//
+// @field(run_func)		If the command has been provided a function to run (see modes above)
 typedef struct args {
     const char *build_name;
     char *run_args;

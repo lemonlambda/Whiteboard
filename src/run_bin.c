@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <err.h>
 
+#include "err.h"
 #include "debug.h"
 #include "args_parser.h"
 #include "toml_format.h"

@@ -1,11 +1,11 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <err.h>
 #include <assert.h>
 
 #include "rust_types.h"
 #include "args_parser.h"
-#include "err.h"
 
 #define maybe_free(ptr) if (ptr != NULL) { free((void *)ptr); ptr = NULL; }
 

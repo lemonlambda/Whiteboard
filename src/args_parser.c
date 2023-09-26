@@ -1,7 +1,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
-#include <err.h>
+#include "win_safe_err.h"
 #include <assert.h>
 
 #include "rust_types.h"

@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <err.h>
 
 #include "debug.h"
 #include "args_parser.h"
@@ -10,6 +9,7 @@
 #include "run_bin.h"
 #include "color_codes.h"
 #include "stages.h"
+#include "win_safe_err.h"
 
 void build_bin(package_t *package, bin_t *bin, args_t *args) {
     stage_t stage;

@@ -5,13 +5,13 @@
 #include "toml_format.h"
 #include "platform_specific.h"
 #include "color_codes.h"
+#include "err.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include <dirent.h>
-#include <err.h>
 
 #define streq(str1, str2) strcmp(str1, str2) == 0
 

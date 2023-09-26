@@ -2,9 +2,9 @@
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
-#include <err.h>
 #include <assert.h>
 
+#include "err.h"
 #include "run_bin.h"
 #include "rust_types.h"
 #include "toml.h"

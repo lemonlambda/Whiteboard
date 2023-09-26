@@ -2,7 +2,6 @@
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
-#include <err.h>
 #include <assert.h>
 
 #include "run_bin.h"
@@ -11,6 +10,8 @@
 #include "toml_format.h"
 #include "args_parser.h"
 #include "debug.h"
+#include "platform_specific.h"
+#include "win_safe_err.h"
 
 // @desc Entrypoint for Whiteboard
 // @arg(argc) Argument count
@@ -19,11 +20,18 @@
 int main(int argc, const char **argv) {
     assert(argv != NULL);
 
+#ifdef WIN32
+    if (argc >= 1)
+        err_program_name = argv[0];
+    else
+        err_program_name = "whiteboard";
+#endif
+
     #ifdef DEBUG
         printf("ArgC: %d\n", argc);
     #endif
 
-    if (argc == 1)
+    if (argc <= 1)
         errx(1, "Invalid amount of args. You need to provide a sub-command of: `run`, `build`, `test`, or `clean`");
 
     args_t args = parse_args(argc, argv);

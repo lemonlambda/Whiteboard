@@ -3,8 +3,8 @@
 #include "vector.h"
 #include "platform_specific.h"
 #include "debug.h"
-#include "err.h"
 
+#include <err.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>

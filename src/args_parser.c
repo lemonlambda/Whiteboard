@@ -30,16 +30,28 @@ const char *null_str(const char *value) {
     return (value ? (strcmp(value, "") == 0 ? "EMPTY_STRING" : value): "NULL");
 }
 
-char *to_string(args_t *args) {
-    const char *null_build_name = null_str(args->build_name);
-    const char *null_run_args = null_str(args->run_args);
+char *to_string(args_t args) {
+    const char *null_build_name = null_str(args.build_name);
+    const char *null_run_args = null_str(args.run_args);
 
-    char *format = "struct args \n{\n\tbuild_name: %s\n\trun_args: %s\n\trun_mode: %i\n\tbuild_mode: %i\n\tclean_mode: %i\n\ttest_mode: %i\n\tdefault_build: %i\n\tquiet_mode: %i\n\trun_func: %i\n}";
+    char *format = "\
+struct args \n\
+{\n\
+	build_name: %s\n\
+	run_args: %s\n\
+	run_mode: %i\n\
+	build_mode: %i\n\
+	clean_mode: %i\n\
+	test_mode: %i\n\
+	default_build: %i\n\
+	quiet_mode: %i\n\
+	run_func: %i\n\
+}";
     char displayed[strlen(format) + strlen(null_build_name) + strlen(null_run_args) + 1 + 1 + 1 + 1 + 1];
     sprintf(
         displayed, 
         format,
-        null_build_name, null_run_args, args->run_mode, args->build_mode, args->clean_mode, args->test_mode, args->default_build, args->quiet_mode, args->run_func
+        null_build_name, null_run_args, args.run_mode, args.build_mode, args.clean_mode, args.test_mode, args.default_build, args.quiet_mode, args.run_func
     );
     char *final = malloc(sizeof(char) * (strlen(displayed) + 1));
     strcpy(final, displayed);
@@ -51,7 +63,7 @@ void free_args(args_t args) {
     maybe_free(args.run_args);
 }
 
-bool run(const char *arg, args_t *args) {
+bool check_default_build(const char *arg, args_t *args) {
     if (strcmp(arg, "--") != 0) {
 	free((void*)args->build_name);
         args->build_name = strdup(arg);
@@ -82,7 +94,7 @@ args_t parse_args(int argc, const char **argv) {
             // I don't know if I should be putting this here but I am so let's see if it fucks up
             // later down the line
             args.default_build = false;
-            got_two_dashes = run(arg, &args);
+            got_two_dashes = check_default_build(arg, &args);
         } else if (got_two_dashes) {
             char formatted[strlen(arg) + 5];
             sprintf(formatted, "%s ", arg);

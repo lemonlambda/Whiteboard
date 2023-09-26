@@ -12,6 +12,10 @@
 #include "args_parser.h"
 #include "debug.h"
 
+// @desc Entrypoint for Whiteboard
+// @arg(argc) Argument count
+// @arg(argv) Argument list
+// @returns Exit status
 int main(int argc, const char **argv) {
     assert(argv != NULL);
 
@@ -29,7 +33,7 @@ int main(int argc, const char **argv) {
         printf("%s\n", stringed);
         free(stringed);
     #endif
-    
+
     if (!args.run_func)
         errx(1, "You need to provide a sub-command of: `run`, `build`, `test`, or `clean`");
 

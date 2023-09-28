@@ -73,8 +73,14 @@ void free_stage(stage_t self);
 
 // @desc	Gets all the source files in one big string using the bin info.
 // @arg(bin)	`bin_t` to read
+// @arg(args)    `arg_t` to get the extension
 // @returns	Space-delimited list of all source files
 char *get_source_files(bin_t* bin);
+// @desc    Gets all the single files from a dir, helper function for `get_source_files`
+// @arg(srcdir)    Name of the dir it's looking in
+// @arg(extension)    Source file extension it's looking for
+// @returns    Space delimitted list of all source files
+char *get_single_source_files(char *srcdir, char *extension);
 // @desc		Replaces all the substitution strings in a command with package/bin fields
 // @arg(cmd)		Command to read from
 // @arg(package)	Package/project config

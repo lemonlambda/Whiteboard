@@ -151,11 +151,6 @@ void free_command(command_t cmd) {
     free(cmd.command);
 }
 
-usize find_size(char *cmd, package_t *project, bin_t *bin);
-usize count_string(const char *str1, const char *str2);
-
-char *get_source_files(bin_t* bin);
-
 // Replaces the args like `{binname}` in commands to real things
 // WARN: You need to free the returning char *
 char *replace_args(command_t *cmd, package_t *project, bin_t *bin) {
@@ -202,7 +197,7 @@ char *replace_args(command_t *cmd, package_t *project, bin_t *bin) {
     return format;
 }
 
-char *get_single_source_files(char *srcdir)
+char *get_single_source_files(char *srcdir, char *extension)
 {
     usize current_size = 64;
     char *src_dir = calloc(1, sizeof(char) * current_size);
@@ -225,9 +220,15 @@ char *get_single_source_files(char *srcdir)
             continue;
         }
         const usize length = strlen(en->d_name);
+        
         if (length <= 2)
             continue;
-        else if (!(en->d_name[length - 1] == 'c' && en->d_name[length - 2] == '.'))
+        
+        char *extension = strrchr(en->d_name, '.');
+        
+        if (!extension)
+            continue;
+        if (strcmp((extension + 1), extension) == 0)
             continue;
         #ifdef WIN32
             if (!first_run) {
@@ -260,7 +261,7 @@ char *get_source_files(bin_t *bin) {
 		char *src_dir = calloc(1, current_size);
 		assert (src_dir != NULL);
 		for (usize i = 0; i < bin->srcdir.multi.len; ++i) {
-			char *to_append = get_single_source_files(bin->srcdir.multi.contents[i]);
+			char *to_append = get_single_source_files(bin->srcdir.multi.contents[i], bin->extension);
 			usize to_append_len = strlen(to_append);
 			usize src_dir_len = strlen(src_dir);
 			while (current_size < to_append_len + src_dir_len + 2)
@@ -273,7 +274,7 @@ char *get_source_files(bin_t *bin) {
 		}
 		return src_dir;
 	} else {
-		return get_single_source_files(bin->srcdir.single);
+		return get_single_source_files(bin->srcdir.single, bin->extension);
 	}
 }
 

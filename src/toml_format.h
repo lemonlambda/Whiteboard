@@ -51,6 +51,7 @@ typedef struct sources {
 // @field(ld)			Linker to use
 // @field(ccargs)		Args to use during compilation
 // @field(ldargs)		Args to use during linking
+// @field(extension)    Extension of the source files
 // @field(callbacks)		Callback function container
 // @field(callbacks.print_bin)	DEBUG-only human-readable printer for `bin_t` objects
 typedef struct bin {
@@ -64,6 +65,7 @@ typedef struct bin {
     char *ld;
     char *ccargs;
     char *ldargs;
+    char *extension;
 
     struct {
         #ifdef DEBUG

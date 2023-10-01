@@ -42,8 +42,11 @@ gcc -B gcc target\Whiteboard\obj\* -o target\Whiteboard\bin\NewRelease-0.0.1.0
 
 # CLI Usage
 `whiteboard run <name?>` If no name is supplied builds and runs the default bin otherwise it will build and run the bin with that name.
+
 `whiteboard build <name?>` If no name is supplied it builds the default bin otherwise it will build the bin with that name.
+
 `whiteboard test <name>` Builds and runs the test with that name.
+
 `whiteboard clean` Removes the target dir.
 
 # Examples

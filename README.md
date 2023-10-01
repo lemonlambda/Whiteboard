@@ -29,3 +29,9 @@ default = true
 name = "Example"
 ```
 Now you can run `whiteboard run` to run the project, where whiteboard is the exe of whiteboard.
+
+# The heart of this project are our contributors 💖 : 
+
+<a href="https://github.com/LemonjamesD/Whiteboard/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=LemonjamesD/Whiteboard"/>
+</a>

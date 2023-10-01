@@ -49,6 +49,7 @@ gcc -B gcc target\Whiteboard\obj\* -o target\Whiteboard\bin\NewRelease-0.0.1.0
 
 `whiteboard clean` Removes the target dir.
 
+
 # Examples
 This is an example config you can use (and it will use gcc by default)
 ```toml

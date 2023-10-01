@@ -1,28 +1,21 @@
 # Whiteboard is a simple buildtool for C
-Whiteboard is a simple buildtool for C.
-Whiteboard is meant to be plug and play and really simple and easy to use. If you look in the Examples sections can you see how you can easily set this up.
+Whiteboard is a simple buildtool for C, meant to be easy to use.
 
 # Features
-* Easy plug and play design
-* TOML is easy to learn and use
-* Test support
-* Change CC and LD easily along with their args
-* Different source file extensions (for compatibliity with C++)
+* Designed for simplicity
+* Uses TOML for configuration
+* Supports testing frameworks
+* Allows easy change of compiler and linker programs and flags
+* Use of custom source extensions
 
 # How it works
-Whiteboard will create a `target` dir with your package name as another dir inside so file structure will look like this:
+Whiteboard will create a target directory in your project root, and inside that a directory for each package, with the build artifacts, like so:
 ```
 target/
-  Example/
-```
-Whiteboard will then create a `bin` and `obj` dir inside of the project name dir so it will look like this:
-```
-target/
-  Example/
+  YourProjectName/
     bin/
     obj/
 ```
-Whiteboard builds your `src` dir and lumps everything into the `obj` dir (subject to change) and then builds with those objs into the `bin` folder with the name of the bin and version in the format of `<binname>-<version>`.
 
 # Compiling
 You can run these commands with gcc to compile (on linux) or figure it out on your own.

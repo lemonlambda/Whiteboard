@@ -224,11 +224,11 @@ char *get_single_source_files(char *srcdir, char *extension)
         if (length <= 2)
             continue;
         
-        char *extension = strrchr(en->d_name, '.');
+        char *en_extension = strrchr(en->d_name, '.');
         
-        if (!extension)
+        if (!en_extension)
             continue;
-        if (strcmp((extension + 1), extension) == 0)
+        if (strcmp((en_extension + 1), extension) != 0)
             continue;
         #ifdef WIN32
             if (!first_run) {

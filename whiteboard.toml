@@ -1,10 +1,10 @@
 [package]
 name = "Whiteboard"
-version = "0.0.1.0"
+version = "0.0.1.1"
 
 [[bin]]
 default = true
-name = "NewRelease"
+name = "Release"
 cc = "gcc"
 ld = "gcc"
 ccargs = "-O2 -Wall -Wextra"
@@ -12,7 +12,15 @@ ldargs = "-B gcc"
 includedir = "src"
 
 [[bin]]
-name = "Stable"
+name = "StaticRelease"
+cc = "gcc"
+ld = "gcc"
+ccargs = "-O3 -Wall -Wextra"
+ldargs = "-static -B gcc"
+includedir = "src"
+
+[[bin]]
+name = "Debug"
 includedir = "src"
 
 [[test]]

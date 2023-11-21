@@ -2,7 +2,7 @@
 
 // Comment this out in release builds
 // #define DEBUG
-#ifdef DEBUG
+// #ifdef DEBUG
     // Even more debug messages
     // #define EXPLICIT_DEBUG
-#endif
+// #endif
